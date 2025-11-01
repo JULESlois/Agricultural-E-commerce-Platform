@@ -1,6 +1,17 @@
 const express = require('express');
 const { pool, testConnection } = require('./database');
-const authRoutes = require('./routes/auth');
+const farmerRoutes = require('./routes/farmers');
+const buyerRoutes = require('./routes/buyers');
+const addressRoutes = require('./routes/addresses');
+const sourceRoutes = require('./routes/source');
+const orderRoutes = require('./routes/order');
+const couponRoutes = require('./routes/coupon');
+const followRoutes = require('./routes/follow');
+const footprintRoutes = require('./routes/footprint');
+const aftersaleRoutes = require('./routes/aftersale');
+const collectionRoutes = require('./routes/collection');
+const statsRoutes = require('./routes/stats');
+const categoryRoutes = require('./routes/category');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -10,7 +21,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 路由
-app.use('/api/auth', authRoutes);
+app.use('/api/farmers', farmerRoutes);
+app.use('/api/buyers', buyerRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api', sourceRoutes);
+app.use('/api', orderRoutes);
+app.use('/api', couponRoutes);
+app.use('/api', followRoutes);
+app.use('/api', footprintRoutes);
+app.use('/api', aftersaleRoutes);
+app.use('/api', collectionRoutes);
+app.use('/api', statsRoutes);
+app.use('/api', categoryRoutes);
+app.use('/api', require('./routes/activity'));
 
 // 测试数据库连接
 testConnection();
