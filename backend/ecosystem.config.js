@@ -25,6 +25,19 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3001
       }
+    },
+    {
+      name: 'community-service',
+      cwd: './community',
+      script: 'index.js',
+      env: {
+        NODE_ENV: 'development',
+        PORT: 3003
+      },
+      env_production: {
+        NODE_ENV: 'production',
+        PORT: 3003
+      }
     }
   ]
 };

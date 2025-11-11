@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "Agricultural E-commerce Platform Backend",
   "scripts": {
-    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:market\"",
+    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:market\" \"npm run dev:community\"",
     "dev:auth": "cd auth && npm run dev",
     "dev:market": "cd market && npm run dev",
-    "start": "concurrently \"npm run start:auth\" \"npm run start:market\"",
+    "dev:community": "cd community && npm run dev",
+    "start": "concurrently \"npm run start:auth\" \"npm run start:market\" \"npm run start:community\"",
     "start:auth": "cd auth && npm start",
     "start:market": "cd market && npm start",
-    "install:all": "cd auth && npm install && cd ../market && npm install"
+    "start:community": "cd community && npm start",
+    "install:all": "cd auth && npm install && cd ../market && npm install && cd ../community && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
