@@ -6,20 +6,23 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "test": "jest",
     "test:register": "node test-register.js",
     "db:init": "psql -h 82.157.154.143 -p 5432 -U agri_root -d agri -f sql/init.sql"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.3",
-    "dotenv": "^16.3.1",
     "bcrypt": "^5.1.1",
-    "joi": "^17.11.0",
     "crypto": "^1.0.1",
-    "jsonwebtoken": "^9.0.2"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "jest": "^30.2.0",
+    "jest-junit": "^16.0.0",
+    "nodemon": "^3.0.1"
   }
 }
