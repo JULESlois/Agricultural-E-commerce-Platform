@@ -1,7 +1,0 @@
-{
-  "host": "82.157.154.143",
-  "port": "5432",
-  "db": "agri",
-  "user": "agri_root",
-  "password": "agri_root"
-}
