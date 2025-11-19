@@ -1,6 +1,5 @@
 const contentController = require('../../controllers/contentController');
 const categoryController = require('../../controllers/categoryController');
-const { Content, Category, Comment, Like, Collect } = require('../../models');
 
 // 模拟 Express 的 req, res, next
 const mockRequest = (params = {}, query = {}, body = {}, user = null) => ({
@@ -20,51 +19,57 @@ const mockResponse = () => {
 const mockNext = jest.fn();
 
 // Mock Sequelize models
-jest.mock('../../models', () => ({
-  Content: {
-    findAll: jest.fn(),
-    findByPk: jest.fn(),
-    findOne: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    destroy: jest.fn()
-  },
-  Category: {
-    findAll: jest.fn(),
-    findByPk: jest.fn()
-  },
-  Comment: {
-    findAll: jest.fn(),
-    create: jest.fn(),
-    count: jest.fn()
-  },
-  Like: {
-    findOne: jest.fn(),
-    create: jest.fn(),
-    destroy: jest.fn(),
-    count: jest.fn()
-  },
-  Collect: {
-    findOne: jest.fn(),
-    create: jest.fn(),
-    destroy: jest.fn()
-  },
-  Follow: {
-    findOne: jest.fn(),
-    findAll: jest.fn(),
-    create: jest.fn(),
-    destroy: jest.fn()
-  },
-  Tag: {
-    findAll: jest.fn()
-  },
-  sequelize: {
+jest.mock('../../models', () => {
+  const mockSequelize = {
+    literal: jest.fn((sql) => sql),
     transaction: jest.fn(() => ({
       commit: jest.fn(),
       rollback: jest.fn()
     }))
-  }
-}));
+  };
+
+  return {
+    Content: {
+      findAll: jest.fn(),
+      findByPk: jest.fn(),
+      findOne: jest.fn(),
+      findAndCountAll: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      destroy: jest.fn()
+    },
+    Category: {
+      findAll: jest.fn(),
+      findByPk: jest.fn()
+    },
+    Comment: {
+      findAll: jest.fn(),
+      create: jest.fn(),
+      count: jest.fn()
+    },
+    Like: {
+      findOne: jest.fn(),
+      create: jest.fn(),
+      destroy: jest.fn(),
+      count: jest.fn()
+    },
+    Collect: {
+      findOne: jest.fn(),
+      create: jest.fn(),
+      destroy: jest.fn()
+    },
+    Follow: {
+      findOne: jest.fn(),
+      findAll: jest.fn(),
+      create: jest.fn(),
+      destroy: jest.fn()
+    },
+    Tag: {
+      findAll: jest.fn()
+    },
+    sequelize: mockSequelize
+  };
+});
 
 describe('Controllers 单元测试', () => {
   beforeEach(() => {
@@ -74,18 +79,27 @@ describe('Controllers 单元测试', () => {
   describe('ContentController', () => {
     describe('getContentList', () => {
       test('应该返回内容列表', async () => {
+        const { Content } = require('../../models');
+        
         const mockContents = [
           {
             content_id: 1,
             content_title: '测试标题',
+            content_cover: null,
             view_count: 10,
             like_count: 5,
             comment_count: 2,
-            author_id: 1
+            author_id: 1,
+            category: {
+              category_name: '测试分类'
+            }
           }
         ];
 
-        Content.findAll.mockResolvedValue(mockContents);
+        Content.findAndCountAll.mockResolvedValue({
+          count: 1,
+          rows: mockContents
+        });
 
         const req = mockRequest({}, { page: 1, limit: 20, sort: 'latest' });
         const res = mockResponse();
@@ -103,17 +117,24 @@ describe('Controllers 单元测试', () => {
       });
 
       test('应该支持分类筛选', async () => {
-        Content.findAll.mockResolvedValue([]);
+        const { Content } = require('../../models');
+        
+        Content.findAndCountAll.mockResolvedValue({
+          count: 0,
+          rows: []
+        });
 
         const req = mockRequest({}, { category_id: 101 });
         const res = mockResponse();
 
         await contentController.getContentList(req, res, mockNext);
 
-        expect(Content.findAll).toHaveBeenCalledWith(
+        expect(Content.findAndCountAll).toHaveBeenCalledWith(
           expect.objectContaining({
             where: expect.objectContaining({
-              category_id: 101
+              category_id: 101,
+              audit_status: 1,
+              is_deleted: 0
             })
           })
         );
@@ -122,6 +143,8 @@ describe('Controllers 单元测试', () => {
 
     describe('getContentDetail', () => {
       test('应该返回内容详情', async () => {
+        const { Content } = require('../../models');
+        
         const mockContent = {
           content_id: 1,
           content_title: '测试标题',
@@ -129,8 +152,18 @@ describe('Controllers 单元测试', () => {
           author_id: 1,
           audit_status: 1,
           is_deleted: 0,
-          increment: jest.fn(),
-          reload: jest.fn()
+          category: {
+            category_id: 1,
+            category_name: '测试分类'
+          },
+          increment: jest.fn().mockResolvedValue(true),
+          reload: jest.fn().mockResolvedValue(true),
+          toJSON: jest.fn().mockReturnValue({
+            content_id: 1,
+            content_title: '测试标题',
+            content_text: '测试内容',
+            author_id: 1
+          })
         };
 
         Content.findOne.mockResolvedValue(mockContent);
@@ -145,6 +178,8 @@ describe('Controllers 单元测试', () => {
       });
 
       test('内容不存在时应该返回 404', async () => {
+        const { Content } = require('../../models');
+        
         Content.findOne.mockResolvedValue(null);
 
         const req = mockRequest({ content_id: 999 });
@@ -164,19 +199,24 @@ describe('Controllers 单元测试', () => {
 
     describe('likeContent', () => {
       test('应该成功点赞内容', async () => {
+        const { Content, Like } = require('../../models');
+        
         const mockContent = {
           content_id: 1,
           like_count: 5,
-          increment: jest.fn(),
-          reload: jest.fn().mockResolvedValue({ like_count: 6 })
+          increment: jest.fn().mockResolvedValue(true),
+          reload: jest.fn().mockImplementation(function() {
+            this.like_count = 6;
+            return Promise.resolve(this);
+          })
         };
 
-        Content.findOne.mockResolvedValue(mockContent);
+        Content.findByPk.mockResolvedValue(mockContent);
         Like.findOne.mockResolvedValue(null);
         Like.create.mockResolvedValue({ like_id: 1 });
 
         const req = mockRequest(
-          { content_id: 1 },
+          { content_id: '1' },
           {},
           {},
           { user_id: 1 }
@@ -187,21 +227,31 @@ describe('Controllers 单元测试', () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(Like.create).toHaveBeenCalledWith({
-          content_id: 1,
+          content_id: '1',
           user_id: 1
         });
         expect(mockContent.increment).toHaveBeenCalledWith('like_count');
+        expect(res.json).toHaveBeenCalledWith(
+          expect.objectContaining({
+            code: 200,
+            data: expect.objectContaining({
+              current_like_count: 6
+            })
+          })
+        );
       });
 
       test('重复点赞应该返回错误', async () => {
+        const { Content, Like } = require('../../models');
+        
         const mockContent = { content_id: 1 };
         const existingLike = { like_id: 1 };
 
-        Content.findOne.mockResolvedValue(mockContent);
+        Content.findByPk.mockResolvedValue(mockContent);
         Like.findOne.mockResolvedValue(existingLike);
 
         const req = mockRequest(
-          { content_id: 1 },
+          { content_id: '1' },
           {},
           {},
           { user_id: 1 }
@@ -224,6 +274,8 @@ describe('Controllers 单元测试', () => {
   describe('CategoryController', () => {
     describe('getCategoryTree', () => {
       test('应该返回分类树', async () => {
+        const { Category } = require('../../models');
+        
         const mockCategories = [
           { category_id: 1, parent_id: 0, category_name: '种植技术' },
           { category_id: 101, parent_id: 1, category_name: '小麦种植' }
