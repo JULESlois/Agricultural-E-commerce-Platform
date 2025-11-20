@@ -1,0 +1,109 @@
+/* 响应式设计 - 移动端适配 */
+
+/* 移动端基础样式 */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  /* 隐藏桌面端侧边栏 */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* 移动端显示 */
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+/* 桌面端 */
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: block !important;
+  }
+}
+
+/* 平板端 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .tablet-hide {
+    display: none !important;
+  }
+}
+
+/* 响应式容器 */
+.responsive-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .responsive-container {
+    padding: 0 12px;
+  }
+}
+
+/* 响应式网格 */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 20px;
+}
+
+@media (max-width: 1200px) {
+  .responsive-grid {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 触摸优化 */
+@media (max-width: 768px) {
+  button, a, .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  input, textarea, select {
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+  }
+}
+
+/* 移动端卡片样式 */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-content {
+    font-size: 14px;
+  }
+}
+
+/* 移动端间距调整 */
+@media (max-width: 768px) {
+  .section-spacing {
+    margin-bottom: 12px;
+  }
+
+  .content-spacing {
+    gap: 12px;
+  }
+}

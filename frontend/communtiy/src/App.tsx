@@ -4,6 +4,7 @@ import Home from '@/pages/Home';
 import ContentDetail from '@/pages/ContentDetail';
 import Publish from '@/pages/Publish';
 import '@/styles/global.css';
+import '@/styles/responsive.css';
 
 function App() {
   return (
