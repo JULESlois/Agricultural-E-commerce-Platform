@@ -4,7 +4,8 @@ import type { Content, Comment, Category, Tag } from '@/types';
 // 获取内容列表
 export const getContentList = (params?: {
   category_id?: number;
-  sort?: 'hot' | 'new' | 'recommend';
+  content_type?: number;
+  sort?: 'hot' | 'latest';
   page?: number;
   limit?: number;
 }) => {

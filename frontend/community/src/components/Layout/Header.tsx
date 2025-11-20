@@ -1,11 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { colors } from '@/styles/colors';
 import { useUserStore } from '@/store/userStore';
+import { useResponsive } from '@/hooks/useResponsive';
+import MobileHeader from './MobileHeader';
 
 export default function Header() {
   const navigate = useNavigate();
   const { currentUser, isLoggedIn } = useUserStore();
+  const { isMobile } = useResponsive();
 
+  // 移动端使用专用的 Header
+  if (isMobile) {
+    return <MobileHeader />;
+  }
+
+  // 桌面端 Header
   return (
     <header style={styles.header}>
       <div style={styles.container}>

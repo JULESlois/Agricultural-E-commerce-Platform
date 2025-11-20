@@ -114,7 +114,7 @@ export default function Publish() {
 
         <div style={styles.form}>
           <div style={styles.formGroup}>
-            <label style={styles.label}>内容类型</label>
+            <label style={styles.label}>帖子分区</label>
             <div style={styles.typeButtons}>
               {[
                 { value: 1, label: '经验分享' },
@@ -136,7 +136,7 @@ export default function Publish() {
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>分类</label>
+            <label style={styles.label}>主题分类</label>
             <select
               style={styles.select}
               value={formData.category_id}
