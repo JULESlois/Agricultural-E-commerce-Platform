@@ -12,9 +12,9 @@
 
 - 融资服务模块：使用 Spring Boot  
 - 农产品交易模块，用户社区模块，支持中心模块：使用 Node.js + Express.js  
-AI预测模块：使用Flask  
+- AI预测模块：使用Flask  
 - 数据库：使用 PostgreSQL + Redis  
-前端：使用 React  
+- 前端：使用 React  
 - 部署：使用Docker
 
 # 目录
