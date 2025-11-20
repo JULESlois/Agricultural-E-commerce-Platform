@@ -5,6 +5,7 @@ import { getContentList } from '@/api/content';
 import ContentCard from '@/components/ContentCard';
 import UserSidebar from '@/components/Layout/UserSidebar';
 import RightSidebar from '@/components/Layout/RightSidebar';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { Content } from '@/types';
 
 // 背景图路径 - 请将背景图放到 src/assets/background.jpg
@@ -15,6 +16,7 @@ export default function Home() {
   const [contents, setContents] = useState<Content[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortType, setSortType] = useState<'hot' | 'latest'>('hot');
+  const { isMobile, isTablet } = useResponsive();
 
   useEffect(() => {
     loadContents();
@@ -41,13 +43,20 @@ export default function Home() {
 
   return (
     <div style={styles.pageWrapper}>
-      <div style={styles.container}>
-        {/* 左侧：用户信息 */}
-        <UserSidebar />
+      <div style={{
+        ...styles.container,
+        ...(isMobile ? styles.containerMobile : {}),
+        ...(isTablet ? styles.containerTablet : {}),
+      }}>
+        {/* 左侧：用户信息 - 移动端隐藏 */}
+        {!isMobile && <UserSidebar />}
         
         {/* 中间：帖子列表 */}
         <main style={styles.main}>
-          <div style={styles.toolbar}>
+          <div style={{
+            ...styles.toolbar,
+            ...(isMobile ? styles.toolbarMobile : {}),
+          }}>
             <div style={styles.sortTabs}>
               {(['hot', 'latest'] as const).map((type) => (
                 <button
@@ -55,6 +64,7 @@ export default function Home() {
                   style={{
                     ...styles.sortTab,
                     ...(sortType === type ? styles.sortTabActive : {}),
+                    ...(isMobile ? styles.sortTabMobile : {}),
                   }}
                   onClick={() => setSortType(type)}
                 >
@@ -65,9 +75,15 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div style={styles.loading}>加载中...</div>
+            <div style={{
+              ...styles.loading,
+              ...(isMobile ? styles.loadingMobile : {}),
+            }}>加载中...</div>
           ) : (
-            <div style={styles.contentList}>
+            <div style={{
+              ...styles.contentList,
+              ...(isMobile ? styles.contentListMobile : {}),
+            }}>
               {contents.map((content) => (
                 <ContentCard key={content.content_id} content={content} />
               ))}
@@ -78,8 +94,8 @@ export default function Home() {
           )}
         </main>
 
-        {/* 右侧：热门话题和商城入口 */}
-        <RightSidebar />
+        {/* 右侧：热门话题和商城入口 - 移动端和平板隐藏 */}
+        {!isMobile && !isTablet && <RightSidebar />}
       </div>
     </div>
   );
@@ -102,6 +118,14 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '20px',
     alignItems: 'flex-start',
   },
+  containerMobile: {
+    padding: '12px',
+    gap: '12px',
+  },
+  containerTablet: {
+    padding: '16px',
+    gap: '16px',
+  },
   main: {
     flex: 1,
     minWidth: 0,
@@ -113,6 +137,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '16px 20px',
     marginBottom: '20px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+  },
+  toolbarMobile: {
+    borderRadius: '8px',
+    padding: '12px 16px',
+    marginBottom: '12px',
   },
   sortTabs: {
     display: 'flex',
@@ -129,6 +158,10 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
+  sortTabMobile: {
+    padding: '8px 16px',
+    fontSize: '14px',
+  },
   sortTabActive: {
     backgroundColor: colors.primary.bg,
     color: colors.primary.main,
@@ -139,6 +172,9 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '16px',
   },
+  contentListMobile: {
+    gap: '12px',
+  },
   loading: {
     textAlign: 'center',
     padding: '40px',
@@ -146,6 +182,10 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     backdropFilter: 'blur(10px)',
     borderRadius: '12px',
+  },
+  loadingMobile: {
+    padding: '30px',
+    borderRadius: '8px',
   },
   empty: {
     textAlign: 'center',
