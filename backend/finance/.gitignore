@@ -24,3 +24,5 @@ target
 *.sw?
 .codebuddy
 .target
+*.bat
+*.py
