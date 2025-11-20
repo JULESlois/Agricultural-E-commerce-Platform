@@ -2,16 +2,15 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const knowledgeRoutes = require('./routes/knowledge_route');
-const expertRoutes = require('./routes/expert_route');
-const customerServiceRoutes = require('./routes/customerService_route');
+const knowledgeRoutes = require('./routes/knowledge.routes');
+const expertRoutes = require('./routes/expert.routes');
 
 const app = express();
 
 // 中间件
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -22,11 +21,14 @@ app.use((req, res, next) => {
 // 路由注册
 app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api', expertRoutes);
-app.use('/api', customerServiceRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: '知识库与专家咨询服务'
+    });
 });
 
 // 404处理
@@ -50,8 +52,10 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`服务器运行在端口 ${PORT}`);
+    console.log(`========================================`);
+    console.log(`知识库与专家咨询服务已启动`);
+    console.log(`服务器运行在端口: ${PORT}`);
     console.log(`环境: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`时间: ${new Date().toLocaleString('zh-CN')}`);
+    console.log(`========================================`);
 });
-
-module.exports = app;
