@@ -1,0 +1,16 @@
+{
+  "name": "agricultural-help-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node app.js",
+    "test": "npx jest",
+    "test:watch": "npx jest --watch",
+    "test:cov": "npx jest --coverage"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
+  }
+}

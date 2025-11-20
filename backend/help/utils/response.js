@@ -1,11 +1,17 @@
-exports.successResponse = (res, statusCode, message, data = null) => {
-    const response = { code: statusCode, message: message };
-    if (data !== null) response.data = data;
-    return res.status(statusCode).json(response);
+const success = (res, code, message, data = null) => {
+    res.status(code).json({
+        code,
+        message,
+        data,
+    });
 };
 
-exports.errorResponse = (res, statusCode, message, error = null) => {
-    const response = { code: statusCode, message: message };
-    if (error) response.error = error;
-    return res.status(statusCode).json(response);
+const fail = (res, code, message, error = null) => {
+    res.status(code).json({
+        code,
+        message,
+        error,
+    });
 };
+
+module.exports = { success, fail };

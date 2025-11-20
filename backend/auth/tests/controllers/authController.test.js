@@ -3,7 +3,7 @@ const UserModel = require('../../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-jest.mock('../../database.js');
+jest.mock('../../db.js');
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 

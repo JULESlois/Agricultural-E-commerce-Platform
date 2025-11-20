@@ -1,6 +1,6 @@
 /**
  * 初始化数据库表
- * 运行: node init-database.js
+ * 运行: node init-db.js
  */
 
 require('dotenv').config();
