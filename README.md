@@ -19,14 +19,12 @@ AI预测模块：使用Flask
 
 # 目录
 
-⁺/frontend/market node.js (Express.js) 后端，农产品交易模块
+/market node.js (Express.js) 后端，农产品交易模块
 
-FFT/endpoint/financejava spring-booft后端，融资服务模块
+/finance spring-booft后端，融资服务模块
 
-⁺/frontend/community node.js (Express.js) 后端，用户社区模块
+/community node.js (Express.js) 后端，用户社区模块
 
-FFT/Pyramid/Pyramid.py /frontend/forecast python flask后端，预测模型/信用评估模型目录
+/forecast python flask后端，预测模型/信用评估模型目录
 
-⁻⁸⁻⁶⁻⁷⁻⁵⁻⁶⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁺
-
-/frontend/\*\*page react前端
+/frontend/*page react前端
