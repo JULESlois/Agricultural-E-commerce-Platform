@@ -1,7 +1,32 @@
-目录
-/backend/market  node.js (Express.js) 后端，农产品交易模块
-/backend/finance  java spring-boot后端，融资服务模块
-/backend/community  node.js (Express.js) 后端，用户社区模块
-/backend/forecast  python flask后端，预测模型/信用评估模型目录
-/backend/help  node.js (Express.js) 后端，知识库/专家咨询/支持中心
-/frontend/**page  react前端
+# 项目说明
+
+本项目旨在打造“基于数字经济的农产品融销一体平台”，构建“融资  $+$  销售  $+$  服务”三位一体的数字化新生态。
+
+产品层面：开发具备融资服务、农产品交易、专家助力、个人信息管理等核心功能的线上平台，涵盖农户端、投资方（银行）端、专家端等多端适配功能，同时提供基于时间序列的农产品价格预测等可选扩展功能。
+
+项目可交付成果：可正常运行的软件平台、项目管理相关文档、测试与质量保证相关报告。
+
+实现路径：通过团队组建与项目确立、范围与需求管理、进度与成本控制、文档审查、代码评审、测试实验收等阶段，结合项目管理与质量保证措施，确保平台按计划、高质量交付。
+
+# 项目采用微服务架构
+
+- 融资服务模块：使用 Spring Boot  
+- 农产品交易模块，用户社区模块，支持中心模块：使用 Node.js + Express.js  
+AI预测模块：使用Flask  
+- 数据库：使用 PostgreSQL + Redis  
+前端：使用 React  
+- 部署：使用Docker
+
+# 目录
+
+⁺/frontend/market node.js (Express.js) 后端，农产品交易模块
+
+FFT/endpoint/financejava spring-booft后端，融资服务模块
+
+⁺/frontend/community node.js (Express.js) 后端，用户社区模块
+
+FFT/Pyramid/Pyramid.py /frontend/forecast python flask后端，预测模型/信用评估模型目录
+
+⁻⁸⁻⁶⁻⁷⁻⁵⁻⁶⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁻⁵⁺
+
+/frontend/\*\*page react前端
