@@ -38,7 +38,10 @@ class SourceModel {
     let paramCount = 1;
 
     if (filters.category_id) {
-      whereClause += ` AND s.category_id = $${paramCount}`;
+      // 支持查询一级分类时返回其所有子分类的商品
+      whereClause += ` AND (s.category_id = $${paramCount} OR s.category_id IN (
+        SELECT category_id FROM mall_product_category WHERE parent_id = $${paramCount}
+      ))`;
       values.push(filters.category_id);
       paramCount++;
     }
@@ -71,10 +74,21 @@ class SourceModel {
 
     return {
       total,
-      list: dataResult.rows.map(row => ({
-        ...row,
-        main_image: JSON.parse(row.product_images || '[]')[0] || null
-      }))
+      list: dataResult.rows.map(row => {
+        let mainImage = null;
+        try {
+          // 尝试解析JSON
+          const images = JSON.parse(row.product_images || '[]');
+          mainImage = Array.isArray(images) ? images[0] : images;
+        } catch (e) {
+          // 如果不是JSON，直接使用字符串
+          mainImage = row.product_images;
+        }
+        return {
+          ...row,
+          main_image: mainImage
+        };
+      })
     };
   }
 
@@ -91,7 +105,15 @@ class SourceModel {
     
     if (result.rows[0]) {
       const source = result.rows[0];
-      source.product_images = JSON.parse(source.product_images || '[]');
+      // 安全解析product_images
+      try {
+        source.product_images = typeof source.product_images === 'string' 
+          ? JSON.parse(source.product_images) 
+          : (Array.isArray(source.product_images) ? source.product_images : [source.product_images]);
+      } catch (e) {
+        // 如果不是JSON，可能是单个URL字符串
+        source.product_images = source.product_images ? [source.product_images] : [];
+      }
       source.seller_info = {
         user_id: source.user_id,
         farm_name: source.farm_name,
