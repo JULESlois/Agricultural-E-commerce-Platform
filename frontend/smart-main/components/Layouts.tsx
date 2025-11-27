@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { PORTAL_NAV_ITEMS, DASHBOARD_MENU } from '../constants';
-import { ShoppingCart, Bell, User, ChevronDown, Search, LogOut, Home, ShoppingBag, Landmark, GraduationCap, HelpCircle, Filter, Trash2, Store } from 'lucide-react';
+import { ShoppingCart, Bell, User, ChevronDown, Search, LogOut, Home, ShoppingBag, Landmark, GraduationCap, HelpCircle, Filter, Trash2, Store, Users } from 'lucide-react';
 import { ChatWidget } from './ChatWidget';
 
 // --- Header Components ---
@@ -34,6 +34,7 @@ const TopHeader = () => {
   const isHelp = location.pathname.startsWith('/help');
   const isKnowledge = location.pathname.startsWith('/knowledge');
   const isFinance = location.pathname.startsWith('/finance');
+  const isCommunity = location.pathname.startsWith('/community');
   
   // Determine which logo to use
   const getLogoSrc = () => {
@@ -56,6 +57,9 @@ const TopHeader = () => {
   } else if (isKnowledge) {
     subtitle = '知识库';
     placeholder = '搜索专家、文章...';
+  } else if (isCommunity) {
+    subtitle = '用户社区';
+    placeholder = '搜索帖子、话题...';
   } else if (isHelp) {
     placeholder = '搜索问题...';
   }
@@ -82,9 +86,9 @@ const TopHeader = () => {
 
   return (
     <header className={`fixed w-full h-[60px] z-50 transition-all duration-300 ${theme.headerBg} ${isPortalHome && isScrolled ? '-top-[60px]' : 'top-0'}`}>
-      <div className="w-full max-w-[1200px] mx-auto px-4 h-full flex items-center justify-between">
+      <div className="w-full max-w-[1600px] mx-auto px-4 h-full flex items-center justify-between">
         {/* Left: Logo */}
-        <Link to="/" className="flex items-center shrink-0 h-full py-2">
+        <Link to="/" className="flex items-center shrink-0 h-full py-2 ml-8 md:ml-16 lg:ml-24">
           <img 
             src={getLogoSrc()} 
             alt="智农链Logo" 
@@ -234,11 +238,32 @@ const PortalNav = () => {
   return (
     <nav className={`fixed w-full h-[50px] bg-white border-b-2 border-[#4CAF50] z-40 shadow-sm hidden md:block transition-all duration-300 ${isPortalHome && isScrolled ? 'top-0' : 'top-[60px]'}`}>
       {/* Changed px-8 to responsive px-4 lg:px-8 to fit smaller screens */}
-      <div className="w-full max-w-[1200px] mx-auto px-4 h-full flex items-center justify-center gap-1">
+      <div className="w-full max-w-[1600px] mx-auto px-4 h-full flex items-center justify-center gap-1">
         {PORTAL_NAV_ITEMS.map((item) => {
           const isActive = item.path === '/' 
             ? location.pathname === '/'
             : location.pathname.startsWith(item.path);
+          
+          // 如果配置为在新标签页打开
+          if (item.openInNewTab) {
+            return (
+              <a
+                key={item.path}
+                href={item.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`
+                  px-4 lg:px-8 h-full flex items-center text-[15px] lg:text-[16px] font-medium transition-all duration-300 relative whitespace-nowrap
+                  ${isActive ? 'text-[#4CAF50] bg-[#F9F9F9]' : 'text-[#212121] hover:bg-[#FAFAFA] hover:text-[#4CAF50]'}
+                `}
+              >
+                {item.label}
+                {isActive && (
+                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#4CAF50] animate-fade-in" />
+                )}
+              </a>
+            );
+          }
             
           return (
             <Link 
@@ -270,6 +295,7 @@ const MobilePortalNav = () => {
       case '/mall': return ShoppingBag;
       case '/finance': return Landmark;
       case '/knowledge': return GraduationCap;
+      case '/community': return Users;
       case '/help': return HelpCircle;
       default: return Home;
     }
@@ -327,7 +353,7 @@ const MobileDashboardNav = () => {
 
 const Footer = () => (
   <footer className="bg-[#FAFAFA] border-t border-[#E0E0E0] pt-[40px] pb-8 mt-auto hidden md:block">
-    <div className="w-full max-w-[1200px] mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
+    <div className="w-full max-w-[1600px] mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-center md:text-left">
       <div>
         <h4 className="text-[14px] font-bold text-[#212121] mb-4">关于我们</h4>
         <ul className="space-y-2 text-xs text-[#757575]">
@@ -402,7 +428,7 @@ export const PortalLayout: React.FC = () => {
           - Other pages with nav: 120px
           - Other pages without nav: 80px
       */}
-      <main className={`flex-grow pb-[80px] md:pb-12 w-full max-w-[1200px] mx-auto px-4 ${
+      <main className={`flex-grow pb-[80px] md:pb-12 w-full max-w-[1600px] mx-auto px-4 ${
         isPortalHome && isScrolled 
           ? 'pt-[60px] md:pt-[60px]' 
           : showPortalNav 
@@ -509,7 +535,7 @@ export const TradeLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
        <header className="h-[80px] bg-white border-b border-[#E0E0E0] flex items-center justify-center sticky top-0 z-50 shadow-sm">
-          <div className="w-full max-w-[1000px] px-4 flex justify-between items-center">
+          <div className="w-full max-w-[1400px] px-4 flex justify-between items-center">
              <Link to="/" className="flex items-center gap-4">
                 <img 
                   src="/assests/logo2.png" 
@@ -523,7 +549,7 @@ export const TradeLayout: React.FC = () => {
              </div>
           </div>
        </header>
-       <main className="flex-grow py-8 px-4 w-full max-w-[1000px] mx-auto">
+       <main className="flex-grow py-8 px-4 w-full max-w-[1400px] mx-auto">
          <Outlet />
        </main>
        <div className="text-center py-6 text-xs text-gray-400">

@@ -59,6 +59,7 @@ const ExpertDashboard = lazy(() => import('./pages/ExpertWorkspace').then(m => (
 const ExpertConsultationList = lazy(() => import('./pages/ExpertWorkspace').then(m => ({ default: m.ExpertConsultationList })));
 const ExpertArticleManager = lazy(() => import('./pages/ExpertWorkspace').then(m => ({ default: m.ExpertArticleManager })));
 const Login = lazy(() => import('./pages/Auth').then(m => ({ default: m.Login })));
+const CommunityHome = lazy(() => import('./pages/Community').then(m => ({ default: m.CommunityHome })));
 const HelpCenter = lazy(() => import('./pages/HelpCenter').then(m => ({ default: m.HelpCenter })));
 const Feedback = lazy(() => import('./pages/Feedback').then(m => ({ default: m.Feedback })));
 const MessageCenter = lazy(() => import('./pages/MessageCenter').then(m => ({ default: m.MessageCenter })));
@@ -131,6 +132,9 @@ const App: React.FC = () => {
           <Route path="/knowledge/expert/:id" element={<ExpertProfile />} /> {/* K-04 */}
           <Route path="/knowledge/ask" element={<AskQuestion />} /> {/* K-05 */}
           <Route path="/knowledge/article/:id" element={<ArticleDetail />} /> {/* K-02 */}
+          
+          {/* Community Public */}
+          <Route path="/community" element={<CommunityHome />} /> {/* COM-01 */}
           
           <Route path="/help" element={<HelpCenter />} />
           <Route path="/help/feedback" element={<Feedback />} />

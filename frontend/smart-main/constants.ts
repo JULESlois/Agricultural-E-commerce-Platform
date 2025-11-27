@@ -31,6 +31,7 @@ export const PORTAL_NAV_ITEMS: NavItem[] = [
   { label: '产链直销', path: '/mall' },
   { label: '助农金融', path: '/finance' },
   { label: '专家智库', path: '/knowledge' },
+  { label: '用户社区', path: '/community' },
   { label: '帮助中心', path: '/help' },
 ];
 

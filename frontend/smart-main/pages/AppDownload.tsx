@@ -28,9 +28,9 @@ export const AppDownload: React.FC = () => {
         <div className="relative w-[280px] md:w-[320px] aspect-[9/19] bg-gray-900 rounded-[3rem] border-8 border-gray-800 shadow-2xl overflow-hidden hidden md:block transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-gray-800 rounded-b-xl z-20"></div>
            <img 
-             src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+             src="/assests/app-download.png" 
              alt="App Screenshot" 
-             className="w-full h-full object-cover opacity-80"
+             className="w-full h-full object-cover"
            />
            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6 text-white">
               <div className="font-bold text-xl mb-1">智农链 App</div>

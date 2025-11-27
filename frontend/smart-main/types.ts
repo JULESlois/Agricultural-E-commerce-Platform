@@ -70,6 +70,7 @@ export interface NavItem {
   label: string;
   path: string;
   activePattern?: RegExp;
+  openInNewTab?: boolean; // 是否在新标签页打开
 }
 
 export interface Metric {

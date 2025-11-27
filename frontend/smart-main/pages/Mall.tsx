@@ -140,38 +140,7 @@ const MallBanner = () => {
   );
 };
 
-// [M-04] Advanced Filter Panel
-const FilterPanel = () => {
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 text-sm shadow-sm">
-      <div className="flex items-start gap-4 pb-3 border-b border-dashed border-gray-100">
-        <span className="text-gray-500 font-medium w-16 flex-shrink-0 mt-1">分类：</span>
-        <div className="flex flex-wrap gap-2">
-           <span className="px-3 py-1 bg-[#4CAF50] text-white rounded cursor-pointer">全部</span>
-           {['苹果', '柑橘', '葡萄', '梨', '桃子', '瓜类', '热带水果'].map(i => (
-             <span key={i} className="px-3 py-1 hover:text-[#4CAF50] cursor-pointer rounded hover:bg-green-50">{i}</span>
-           ))}
-        </div>
-      </div>
-      <div className="flex items-start gap-4 py-3 border-b border-dashed border-gray-100">
-        <span className="text-gray-500 font-medium w-16 flex-shrink-0 mt-1">产地：</span>
-        <div className="flex flex-wrap gap-2">
-           {['山东烟台', '陕西洛川', '江西赣州', '新疆阿克苏', '云南昭通'].map(i => (
-             <span key={i} className="px-3 py-1 hover:text-[#4CAF50] cursor-pointer rounded hover:bg-green-50">{i}</span>
-           ))}
-        </div>
-      </div>
-      <div className="flex items-start gap-4 pt-3">
-        <span className="text-gray-500 font-medium w-16 flex-shrink-0 mt-1">筛选：</span>
-        <div className="flex flex-wrap gap-2">
-           {['有机认证', '绿色食品', '地理标志', '坏果包赔', '产地直发'].map(i => (
-             <span key={i} className="px-3 py-1 border border-gray-200 rounded hover:border-[#4CAF50] hover:text-[#4CAF50] cursor-pointer bg-gray-50">{i}</span>
-           ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// FilterPanel 组件已删除 - 只保留排序功能
 
 // [M-05] Sort Bar
 const SortBar = () => {
@@ -341,10 +310,7 @@ export const MallHome: React.FC = () => {
          {/* --- Right Column (80%) --- */}
          <div className="col-span-12 lg:col-span-9">
             
-            {/* [M-04] Filter Panel */}
-            <FilterPanel />
-
-            {/* [M-05] Sort Bar */}
+            {/* [M-05] Sort Bar - 只保留排序选项 */}
             <SortBar />
 
             {/* [M-07] Product Grid */}
