@@ -1,0 +1,130 @@
+/* 莫兰迪色系配色 */
+:root {
+  /* 绿色系 - 主色调 */
+  --morandi-green-dark: #5a7a6f;
+  --morandi-green: #7d9d8f;
+  --morandi-green-light: #a8c5b8;
+  --morandi-green-lighter: #d4e5dd;
+  --morandi-green-bg: #f5f7f6;
+  
+  /* 辅助色 - 莫兰迪色系 */
+  --morandi-brown: #c9a87c;
+  --morandi-gray: #b8a8a0;
+  --morandi-blue: #8ba3b5;
+  --morandi-pink: #d4b5b0;
+  --morandi-yellow: #d9c5a1;
+  --morandi-red: #c98b8b;
+  --morandi-red-light: #d9a5a5;
+  --morandi-orange: #d4a88b;
+}
+
+.layout {
+  min-height: 100vh;
+  background: var(--morandi-green-bg);
+}
+
+.header {
+  background: var(--morandi-green-dark);
+  padding: 0 50px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(90, 122, 111, 0.3);
+}
+
+.logo {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  padding: 24px 50px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.form-item {
+  margin-bottom: 8px;
+}
+
+.form-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8e8e8;
+  background: white;
+}
+
+.ant-card-head {
+  background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ant-card-head-title {
+  color: #333;
+  font-weight: 600;
+}
+
+.ant-statistic-title {
+  font-size: 14px;
+  color: #666;
+}
+
+.ant-statistic-content {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* 按钮样式 - 保持绿底白字 */
+.ant-btn-primary {
+  background: var(--morandi-green-dark) !important;
+  border-color: var(--morandi-green-dark) !important;
+  color: white !important;
+}
+
+.ant-btn-primary:hover {
+  background: var(--morandi-green) !important;
+  border-color: var(--morandi-green) !important;
+  color: white !important;
+}
+
+.ant-btn-default {
+  border-color: #d9d9d9 !important;
+  color: #555 !important;
+}
+
+.ant-btn-default:hover {
+  border-color: var(--morandi-green) !important;
+  color: var(--morandi-green) !important;
+}
+
+/* 选择框样式 */
+.ant-select-focused .ant-select-selector {
+  border-color: var(--morandi-green) !important;
+  box-shadow: 0 0 0 2px rgba(125, 157, 143, 0.2) !important;
+}
+
+.ant-input-number-focused {
+  border-color: var(--morandi-green) !important;
+  box-shadow: 0 0 0 2px rgba(125, 157, 143, 0.2) !important;
+}
+
+/* Tabs样式 */
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--morandi-green-dark) !important;
+}
+
+.ant-tabs-ink-bar {
+  background: var(--morandi-green-dark) !important;
+}
