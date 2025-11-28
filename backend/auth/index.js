@@ -1,4 +1,6 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
@@ -6,6 +8,18 @@ const certRoutes = require('./routes/cert');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+const { pool } = require('../market/database');
+
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+// CORS
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // 调试中间件 - 检查原始请求
 app.use((req, res, next) => {
@@ -67,7 +81,24 @@ app.post('/test', (req, res) => {
 
 // 启动服务器
 app.listen(PORT, () => {
-  console.log(`Auth service running on port ${PORT}`);
+  const base = `http://localhost:${PORT}`;
+  console.log('[认证服务] 已启动');
+  console.log(`端口: ${PORT}`);
+  console.log(`基础URL: ${base}`);
+  console.log(`路由: /api/auth, /api/users, /api/admin, /api`);
+  console.log('跨域: 已启用');
+  console.log(`健康检查: ${base}/`);
+  console.log(`时间: ${new Date().toISOString()}`);
+});
+
+process.on('SIGINT', async () => {
+  await pool.end();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  await pool.end();
+  process.exit(0);
 });
 
 module.exports = app;

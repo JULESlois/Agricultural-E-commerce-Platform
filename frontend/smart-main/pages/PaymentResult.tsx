@@ -4,6 +4,8 @@ import { Button, Card } from '../components/Common';
 import { CheckCircle2, Package, Home } from 'lucide-react';
 
 export const PaymentResult: React.FC = () => {
+  const params = new URLSearchParams(location.search);
+  const oid = params.get('oid') || '—';
   return (
     <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
        <div className="text-center max-w-md w-full p-6">
@@ -15,8 +17,8 @@ export const PaymentResult: React.FC = () => {
           
           <Card className="bg-gray-50 mb-8 p-4 text-left">
              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-500">订单编号</span>
-                <span className="font-medium">202509250001</span>
+                <span className="text灰色-500">订单编号</span>
+                <span className="font-medium">{oid}</span>
              </div>
              <div className="flex justify-between text-sm">
                 <span className="text-gray-500">支付金额</span>

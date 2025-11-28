@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Badge } from '../components/Common';
 import { Search, Filter, Package } from 'lucide-react';
+import { ordersList } from '../api/market';
 
 const TABS = ['全部', '待付款', '待发货', '待收货', '待评价'];
 
 export const BuyerOrders: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('全部');
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+      ordersList().then((r: any) => {
+        const list = r?.data || [];
+        setOrders(Array.isArray(list) ? list : []);
+      }).catch(() => setOrders([]));
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -41,53 +50,53 @@ export const BuyerOrders: React.FC = () => {
 
       {/* Order List */}
       <div className="space-y-4">
-         {[1, 2, 3].map((i) => (
+         {orders.map((o) => (
             <Card key={i} className="p-0 overflow-hidden border border-gray-200">
                <div className="bg-gray-50 px-6 py-3 flex justify-between items-center text-sm text-gray-500 border-b border-gray-200">
                   <div className="flex gap-4">
-                     <span>2025-09-2{i} 14:30</span>
-                     <span className="font-mono">订单号: 2025092{i}0088</span>
-                     <span className="font-medium text-gray-700 hidden sm:inline">绿源果蔬合作社</span>
+                     <span>{o.create_time || ''}</span>
+                     <span className="font-mono">订单号: {o.order_id}</span>
+                     <span className="font-medium text-gray-700 hidden sm:inline">{o.seller_name || ''}</span>
                   </div>
                   <div className="text-[#FF9800] font-medium">
-                     {i === 1 ? '待发货' : i === 2 ? '运输中' : '已完成'}
+                     {o.order_status === 0 ? '待付款' : o.order_status === 1 ? '待发货' : o.order_status === 2 ? '运输中' : o.order_status === 4 ? '已完成' : '处理中'}
                   </div>
                </div>
                
                <div className="p-6 flex flex-col md:flex-row items-center gap-6">
-                  <div className="flex items-center gap-4 flex-1 w-full cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate(`/mall/buyer/order/2025092${i}0088`)}>
-                     <img src={`https://picsum.photos/100/100?random=${i}`} className="w-20 h-20 object-cover rounded bg-gray-200" alt="product" />
+                  <div className="flex items-center gap-4 flex-1 w-full cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate(`/mall/buyer/order/${o.order_id}`)}>
+                     <img src={`https://picsum.photos/100/100?random=${o.order_id}`} className="w-20 h-20 object-cover rounded bg-gray-200" alt="product" />
                      <div>
-                        <h4 className="font-bold text-[#212121] mb-1">有机红富士苹果 (特级) 5kg</h4>
-                        <p className="text-sm text-gray-500">规格: 5kg装</p>
+                        <h4 className="font-bold text-[#212121] mb-1">{o.product_name || ''}</h4>
+                        <p className="text-sm text-gray-500">规格: {o.product_spec || ''}</p>
                      </div>
                   </div>
                   
                   <div className="text-center w-32 hidden md:block">
-                     <div className="text-gray-500">¥85.00</div>
-                     <div className="text-gray-400 text-xs">x1</div>
+                     <div className="text-gray-500">¥{Number(o.unit_price || 0).toFixed(2)}</div>
+                     <div className="text-gray-400 text-xs">x{o.quantity}</div>
                   </div>
                   
                   <div className="text-center w-32 border-l border-gray-100 pl-6 md:pl-0">
-                     <div className="font-bold text-[#212121]">¥85.00</div>
+                     <div className="font-bold text-[#212121]">¥{Number(o.pay_amount || 0).toFixed(2)}</div>
                      <div className="text-xs text-gray-400">含运费 ¥0.00</div>
                   </div>
                   
                   <div className="flex flex-col gap-2 w-full md:w-32">
-                     {i === 1 && <Button variant="ghost" size="sm">提醒发货</Button>}
-                     {i === 2 && (
+                     {o.order_status === 1 && <Button variant="ghost" size="sm">提醒发货</Button>}
+                     {o.order_status === 2 && (
                         <>
                            <Button variant="solid-green" size="sm">确认收货</Button>
-                           <Button variant="ghost" size="sm" onClick={() => navigate(`/mall/buyer/logistics/2025092${i}0088`)}>查看物流</Button>
+                           <Button variant="ghost" size="sm" onClick={() => navigate(`/mall/buyer/logistics/${o.order_id}`)}>查看物流</Button>
                         </>
                      )}
-                     {i === 3 && (
+                     {o.order_status === 4 && (
                         <>
-                           <Button variant="ghost" size="sm" className="border-gray-300 text-gray-600" onClick={() => navigate(`/mall/buyer/review/publish/2025092${i}0088`)}>评价晒单</Button>
-                           <Button variant="text" size="sm" className="text-gray-500" onClick={() => navigate(`/mall/buyer/refund/2025092${i}0088`)}>申请售后</Button>
+                           <Button variant="ghost" size="sm" className="border-gray-300 text-gray-600" onClick={() => navigate(`/mall/buyer/review/publish/${o.order_id}`)}>评价晒单</Button>
+                           <Button variant="text" size="sm" className="text-gray-500" onClick={() => navigate(`/mall/buyer/refund/${o.order_id}`)}>申请售后</Button>
                         </>
                      )}
-                     <Button variant="text" size="sm" className="text-gray-500" onClick={() => navigate(`/mall/buyer/order/2025092${i}0088`)}>订单详情</Button>
+                     <Button variant="text" size="sm" className="text-gray-500" onClick={() => navigate(`/mall/buyer/order/${o.order_id}`)}>订单详情</Button>
                   </div>
                </div>
             </Card>

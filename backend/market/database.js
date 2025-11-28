@@ -3,14 +3,16 @@ const dbConfig = require('./dbconfig.json');
 
 // 创建数据库连接池
 const pool = new Pool({
-  host: dbConfig.host,
-  port: dbConfig.port,
-  database: dbConfig.db,
-  user: dbConfig.user,
-  password: dbConfig.password,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  host: process.env.PG_HOST || dbConfig.host,
+  port: Number(process.env.PG_PORT || dbConfig.port),
+  database: process.env.PG_DB || dbConfig.db,
+  user: process.env.PG_USER || dbConfig.user,
+  password: process.env.PG_PASSWORD || dbConfig.password,
+  max: Number(process.env.PG_POOL_MAX || 5),
+  idleTimeoutMillis: Number(process.env.PG_IDLE_TIMEOUT_MS || 10000),
+  connectionTimeoutMillis: Number(process.env.PG_CONN_TIMEOUT_MS || 2000),
+  application_name: process.env.PG_APP_NAME || 'agri-platform-node',
+  allowExitOnIdle: true,
 });
 
 // 测试数据库连接

@@ -80,9 +80,11 @@ router.get('/cart', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('获取购物车失败:', error);
-    res.status(500).json({
-      code: 500,
-      message: '获取购物车失败: ' + error.message
+    const isConnLimit = error?.code === '53300' || /remaining connection slots/.test(error?.message || '');
+    const status = isConnLimit ? 503 : 500;
+    res.status(status).json({
+      code: status,
+      message: (isConnLimit ? '服务繁忙，请稍后重试。' : '获取购物车失败: ') + (error.message || '')
     });
   }
 });
@@ -148,9 +150,11 @@ router.post('/cart/add', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('添加购物车失败:', error);
-    res.status(500).json({
-      code: 500,
-      message: '添加购物车失败: ' + error.message
+    const isConnLimit = error?.code === '53300' || /remaining connection slots/.test(error?.message || '');
+    const status = isConnLimit ? 503 : 500;
+    res.status(status).json({
+      code: status,
+      message: (isConnLimit ? '服务繁忙，请稍后重试。' : '添加购物车失败: ') + (error.message || '')
     });
   }
 });
@@ -193,9 +197,11 @@ router.put('/cart/:cart_id', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('更新购物车失败:', error);
-    res.status(500).json({
-      code: 500,
-      message: '更新购物车失败: ' + error.message
+    const isConnLimit = error?.code === '53300' || /remaining connection slots/.test(error?.message || '');
+    const status = isConnLimit ? 503 : 500;
+    res.status(status).json({
+      code: status,
+      message: (isConnLimit ? '服务繁忙，请稍后重试。' : '更新购物车失败: ') + (error.message || '')
     });
   }
 });
@@ -224,9 +230,11 @@ router.delete('/cart/:cart_id', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('删除购物车失败:', error);
-    res.status(500).json({
-      code: 500,
-      message: '删除购物车失败: ' + error.message
+    const isConnLimit = error?.code === '53300' || /remaining connection slots/.test(error?.message || '');
+    const status = isConnLimit ? 503 : 500;
+    res.status(status).json({
+      code: status,
+      message: (isConnLimit ? '服务繁忙，请稍后重试。' : '删除购物车失败: ') + (error.message || '')
     });
   }
 });

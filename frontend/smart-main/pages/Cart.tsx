@@ -1,29 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card } from '../components/Common';
 import { MOCK_PRODUCTS } from '../constants';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingCart } from 'lucide-react';
+import { cartList, cartUpdate, cartDelete } from '../api/market';
 
 export const Cart: React.FC = () => {
   const navigate = useNavigate();
-  // Mock cart data derived from products
-  const [items, setItems] = useState([
-    { ...MOCK_PRODUCTS[0], quantity: 2, selected: true },
-    { ...MOCK_PRODUCTS[2], quantity: 1, selected: true },
-  ]);
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+      cartList().then((r: any) => {
+        const list = r?.data || [];
+        const mapped = Array.isArray(list) && list.length > 0 ? list.map((it: any) => ({
+          id: String(it.source_id),
+          title: it.product_name,
+          price: Number(it.unit_price || 0),
+          origin: '产地',
+          imageUrl: it.product_image || 'https://picsum.photos/100',
+          quantity: Number(it.quantity || 1),
+          selected: true,
+          cart_id: it.cart_id
+        })) : [ { ...MOCK_PRODUCTS[0], quantity: 2, selected: true }, { ...MOCK_PRODUCTS[2], quantity: 1, selected: true } ];
+        setItems(mapped);
+      }).catch(() => {
+        setItems([ { ...MOCK_PRODUCTS[0], quantity: 2, selected: true }, { ...MOCK_PRODUCTS[2], quantity: 1, selected: true } ]);
+      });
+  }, []);
 
   const updateQuantity = (id: string, delta: number) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }));
+    const target = items.find(i => i.id === id);
+    const newQty = Math.max(1, (target?.quantity || 1) + delta);
+    setItems(prev => prev.map(item => item.id === id ? { ...item, quantity: newQty } : item));
+    if (target?.cart_id) cartUpdate(Number(target.cart_id), newQty).catch(() => {});
   };
 
   const removeItem = (id: string) => {
+    const target = items.find(i => i.id === id);
     setItems(prev => prev.filter(item => item.id !== id));
+    if (target?.cart_id) cartDelete(Number(target.cart_id)).catch(() => {});
   };
 
   const toggleSelect = (id: string) => {
@@ -150,7 +165,14 @@ export const Cart: React.FC = () => {
                 variant="solid-green" 
                 className="w-full py-3 text-lg"
                 disabled={selectedCount === 0}
-                onClick={() => navigate('/mall/checkout')}
+                onClick={() => {
+                  const first = items.find(i => i.selected);
+                  if (first) {
+                    localStorage.setItem('checkout_source_id', String(first.id));
+                    localStorage.setItem('checkout_quantity', String(first.quantity));
+                  }
+                  navigate('/mall/checkout');
+                }}
               >
                 去结算 ({selectedCount})
               </Button>

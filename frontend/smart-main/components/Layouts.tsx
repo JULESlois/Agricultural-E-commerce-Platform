@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { PORTAL_NAV_ITEMS, DASHBOARD_MENU } from '../constants';
 import { ShoppingCart, Bell, User, ChevronDown, Search, LogOut, Home, ShoppingBag, Landmark, GraduationCap, HelpCircle, Filter, Trash2, Store, Users } from 'lucide-react';
 import { ChatWidget } from './ChatWidget';
+import { useAuth } from '../store/auth';
 
 // --- Header Components ---
 
@@ -448,12 +449,19 @@ export const PortalLayout: React.FC = () => {
 export const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const auth = useAuth();
   // Determine role based on URL for demo purposes
   const role = location.pathname.includes('/banker') ? 'BANKER' : 
                location.pathname.includes('/expert') ? 'EXPERT' : 
                location.pathname.includes('/buyer') ? 'BUYER' : 'FARMER';
   
   const menuItems = DASHBOARD_MENU[role] || DASHBOARD_MENU.FARMER;
+
+  useEffect(() => {
+    if (!auth.token) {
+      navigate('/auth/login');
+    }
+  }, [auth.token]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F5F5]">

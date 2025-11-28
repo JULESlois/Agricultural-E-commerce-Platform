@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Badge, SectionTitle } from '../components/Common';
 import { MOCK_ORDER_DETAIL } from '../constants';
@@ -7,7 +7,34 @@ import { ArrowLeft, MapPin, Truck, Package, MessageSquare, CreditCard, Clock, Re
 export const BuyerOrderDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const order = MOCK_ORDER_DETAIL; // Mock data
+  const [order, setOrder] = useState(MOCK_ORDER_DETAIL);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+      orderDetail(id as string).then((r: any) => {
+        const o = r?.data || {};
+        const mapped = {
+          id: String(o.order_id || id),
+          status: o.order_status === 0 ? 'pending_pay' : o.order_status === 1 ? 'pending_ship' : o.order_status === 2 ? 'shipped' : o.order_status === 4 ? 'completed' : 'pending_pay',
+          createTime: o.create_time || '',
+          payTime: o.payment_time || '',
+          shipTime: o.delivery_time || '',
+          finishTime: o.finish_time || '',
+          shopName: o.seller_name || '',
+          items: [
+            { id: '1', productId: String(o.source_id || ''), name: o.product_name || '', imageUrl: 'https://picsum.photos/100', price: Number(o.unit_price || 0), quantity: Number(o.quantity || 1) }
+          ],
+          totalAmount: Number(o.total_amount || 0),
+          freight: Number(o.freight_amount || 0),
+          discount: Number(o.discount_amount || 0),
+          actualAmount: Number(o.pay_amount || 0),
+          address: { id: 'a', name: o.receiver_name || '收货人', phone: o.receiver_phone || '', province: o.receiver_province || '', city: o.receiver_city || '', district: o.receiver_district || '', detail: o.receiver_detail || '', isDefault: true },
+          logisticsId: o.logistics_no || ''
+        } as any;
+        setOrder(mapped);
+      }).catch((e: any) => { setOrder(MOCK_ORDER_DETAIL); setErrorCode(e?.code || 'resource.not_found'); });
+  }, [id]);
 
   const steps = [
     { label: '提交订单', time: order.createTime, active: true },
@@ -19,7 +46,13 @@ export const BuyerOrderDetail: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
-       <div className="flex items-center gap-4 mb-2">
+       {errorCode && (
+         <div>
+           {/* @ts-ignore */}
+           {React.createElement(require('../components/ErrorBanner').ErrorBanner, { code: errorCode })}
+         </div>
+       )}
+       <div className="flex items中心 gap-4 mb-2">
           <Button variant="ghost" size="sm" onClick={() => navigate('/mall/buyer/orders')}>
              <ArrowLeft size={16} className="mr-1" /> 返回订单列表
           </Button>
@@ -144,3 +177,4 @@ export const BuyerOrderDetail: React.FC = () => {
     </div>
   );
 };
+import { orderDetail } from '../api/market';

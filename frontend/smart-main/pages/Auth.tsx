@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card } from '../components/Common';
 import { User, Lock, Phone, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../store/auth';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const auth = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,18 +17,21 @@ export const Login: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Role-based redirect
-      if (formData.username.trim() === 'seller') {
-        navigate('/mall/seller/dashboard');
-      } else {
-        // Redirect to orders by default for buyers
-        navigate('/mall/buyer/orders');
-      }
-    }, 800);
+    auth.login(formData.username, formData.password)
+      .then(() => {
+        setIsLoading(false);
+        const role = Number(localStorage.getItem('user_type')) || 2;
+        if (role === 1) {
+          navigate('/mall/seller/dashboard');
+        } else if (role === 2) {
+          navigate('/mall/buyer/orders');
+        } else {
+          navigate('/');
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
   };
 
   return (

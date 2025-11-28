@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/farmer/financing")
-@CrossOrigin(origins = "*")
 public class FarmerFinancingController {
     
     @Autowired

@@ -1,29 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Badge } from '../components/Common';
 import { MOCK_PRODUCTS } from '../constants';
 import { MapPin, ChevronRight, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
+import { addressesList, createOrder, payOrder } from '../api/market';
 
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addressId, setAddressId] = useState<number | null>(null);
+  const sourceId = Number(localStorage.getItem('checkout_source_id') || '1');
+  const qty = Number(localStorage.getItem('checkout_quantity') || '1');
   
-  // Mock Cart Data
   const items = [
-    { ...MOCK_PRODUCTS[0], quantity: 2 },
-    { ...MOCK_PRODUCTS[2], quantity: 1 },
+    { ...MOCK_PRODUCTS[0], quantity: qty }
   ];
   
   const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const freight = 0;
   
+  useEffect(() => {
+      addressesList().then((r: any) => {
+        const list = r?.data || [];
+        const def = list.find((a: any) => a.is_default) || list[0];
+        if (def?.address_id) setAddressId(Number(def.address_id));
+      }).catch(() => setAddressId(1));
+  }, []);
+
   const handlePlaceOrder = () => {
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate('/mall/payment/success');
-    }, 1500);
+      const receiver_address_id = addressId || 1;
+      createOrder({ source_id: sourceId, quantity: qty, receiver_address_id })
+        .then((r: any) => {
+          const orderId = r?.data?.order_id || r?.data?.orderId || r?.data?.order_id || r?.data?.id;
+          return payOrder(orderId, 'WECHAT_PAY').then(() => orderId);
+        })
+        .then((orderId: any) => {
+          setIsSubmitting(false);
+          navigate(`/mall/payment/success?oid=${orderId}`);
+        })
+        .catch(() => {
+          setIsSubmitting(false);
+        });
   };
 
   return (

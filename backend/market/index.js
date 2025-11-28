@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { pool, testConnection } = require('./database');
@@ -20,7 +21,14 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // 中间件
-app.use(cors()); // 启用CORS
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -87,12 +95,23 @@ app.get('/api/market/products', async (req, res) => {
       data: result.rows
     });
   } catch (err) {
+    const isConnLimit = err?.code === '53300' || /remaining connection slots/.test(err?.message || '');
     console.error('查询产品数据失败:', err);
-    res.status(500).json({
-      success: false,
-      error: '获取产品数据失败'
+    // 降级为空列表，避免前端页面崩溃
+    res.status(200).json({
+      success: true,
+      data: [],
+      message: isConnLimit ? '服务繁忙，暂时返回空列表' : '暂时无数据'
     });
   }
+});
+
+// 全局错误处理中间件
+app.use((err, req, res, next) => {
+  const isConnLimit = err?.code === '53300' || /remaining connection slots/.test(err?.message || '');
+  const status = isConnLimit ? 503 : 500;
+  const message = isConnLimit ? '服务繁忙，请稍后重试' : '服务器内部错误';
+  res.status(status).json({ code: status, message });
 });
 
 // 启动服务器

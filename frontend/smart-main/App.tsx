@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { PortalLayout, DashboardLayout, TradeLayout } from './components/Layouts';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Loading component
 const PageLoader = () => (
@@ -101,6 +102,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
         <Routes>
         {/* Auth */}
@@ -207,6 +209,7 @@ const App: React.FC = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </Suspense>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 };

@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Badge } from '../components/Common';
 import { MOCK_ADDRESSES } from '../constants';
 import { Plus, Edit2, Trash2, MapPin } from 'lucide-react';
+import { addressesList, addressDelete, addressSetDefault, addressCreate } from '../api/market';
 
 export const BuyerAddress: React.FC = () => {
   const [addresses, setAddresses] = useState(MOCK_ADDRESSES);
   const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState({ name: '张三', phone: '13800138000', province: '北京市', city: '北京市', district: '朝阳区', detail: '建国门外大街1号', isDefault: false });
+
+  useEffect(() => {
+      addressesList().then((r: any) => {
+        const list = r?.data || [];
+        const mapped = list.map((a: any) => ({ id: String(a.address_id || a.id), name: a.receiver_name || a.name, phone: a.receiver_phone || a.phone, province: a.province || '', city: a.city || '', district: a.district || '', detail: a.detail_address || a.detail || '', isDefault: !!a.is_default, tag: a.tag }));
+        setAddresses(mapped.length > 0 ? mapped : MOCK_ADDRESSES);
+      }).catch(() => setAddresses(MOCK_ADDRESSES));
+  }, []);
 
   const handleDelete = (id: string) => {
     if (confirm('确定要删除这个地址吗？')) {
       setAddresses(prev => prev.filter(addr => addr.id !== id));
+      addressDelete(Number(id)).catch(() => {});
     }
   };
 
   const handleSetDefault = (id: string) => {
     setAddresses(prev => prev.map(addr => ({ ...addr, isDefault: addr.id === id })));
+    addressSetDefault(Number(id)).catch(() => {});
   };
 
   // Mock Form Modal
@@ -25,28 +37,33 @@ export const BuyerAddress: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">收货人</label>
-                <input type="text" className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none" defaultValue="张三" />
+                <input type="text" className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
              </div>
              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">手机号码</label>
-                <input type="text" className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none" defaultValue="13800138000" />
+                <input type="text" className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
              </div>
           </div>
           <div>
              <label className="block text-sm font-medium text-gray-700 mb-1">省市区</label>
-             <input type="text" className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none" defaultValue="北京市 朝阳区" />
+             <input type="text" className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none" value={`${form.province} ${form.city} ${form.district}`} onChange={(e) => setForm({ ...form, province: e.target.value })} />
           </div>
           <div>
              <label className="block text-sm font-medium text-gray-700 mb-1">详细地址</label>
-             <textarea className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none h-20" defaultValue="建国门外大街1号" />
+             <textarea className="w-full p-2 border border-gray-300 rounded focus:border-[#4CAF50] focus:outline-none h-20" value={form.detail} onChange={(e) => setForm({ ...form, detail: e.target.value })} />
           </div>
           <div className="flex items-center gap-2">
-             <input type="checkbox" id="default" className="text-[#4CAF50] focus:ring-[#4CAF50] rounded" />
+             <input type="checkbox" id="default" className="text-[#4CAF50] focus:ring-[#4CAF50] rounded" checked={form.isDefault} onChange={(e) => setForm({ ...form, isDefault: e.target.checked })} />
              <label htmlFor="default" className="text-sm text-gray-600">设为默认地址</label>
           </div>
           <div className="flex gap-2 pt-4 justify-end">
              <Button variant="ghost" onClick={() => setIsEditing(false)}>取消</Button>
-             <Button variant="solid-green" onClick={() => setIsEditing(false)}>保存</Button>
+             <Button variant="solid-green" onClick={() => {
+                 const body: any = { receiver_name: form.name, receiver_phone: form.phone, province: form.province, city: form.city, district: form.district, detail_address: form.detail, is_default: form.isDefault };
+                 addressCreate(body).then(() => {
+                   setIsEditing(false);
+                 }).catch(() => setIsEditing(false));
+             }}>保存</Button>
           </div>
        </Card>
     </div>

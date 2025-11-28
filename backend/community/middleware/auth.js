@@ -13,12 +13,13 @@ const authMiddleware = (req, res, next) => {
     }
 
     const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'your-secret-key';
+    const decoded = jwt.verify(token, secret);
     
     req.user = {
-      user_id: decoded.user_id || decoded.id,
-      user_type: decoded.user_type,
-      user_name: decoded.user_name
+      user_id: decoded.user_id || decoded.userId || decoded.id,
+      user_type: decoded.user_type || decoded.userType,
+      user_name: decoded.user_name || decoded.userName
     };
     
     next();

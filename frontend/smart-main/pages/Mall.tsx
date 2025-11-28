@@ -10,6 +10,7 @@ import {
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer 
 } from 'recharts';
+import { marketProducts, cartAdd } from '../api/market';
 
 // --- [M-03] Dashboard Data ---
 const PRICE_DATA = [
@@ -202,10 +203,45 @@ const Pagination = () => {
 export const MallHome: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('fruit');
+  const [products, setProducts] = useState(MOCK_PRODUCTS);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+
+  useEffect(() => {
+      marketProducts().then((r: any) => {
+        const data = r?.data || (r?.success ? r.data : null);
+        if (Array.isArray(data)) {
+          const mapped = data.map((p: any, idx: number) => ({
+            id: String(p.product_id || p.source_id || idx),
+            title: p.product_name || `商品${idx + 1}`,
+            price: Number(p.unit_price || p.price || 0),
+            origin: p.origin || '产地',
+            category: p.category || '农产品',
+            imageUrl: (Array.isArray(p.product_images) ? p.product_images[0] : p.product_images) || 'https://picsum.photos/300',
+            farmerName: p.farmer_name || '合作社',
+            stock: Number(p.total_quantity || 0),
+            tags: ['平台上架'],
+            specs: p.product_spec || '1件',
+            moq: 1
+          }));
+          setProducts(mapped.length > 0 ? mapped : MOCK_PRODUCTS);
+        }
+      }).catch((e: any) => { setProducts(MOCK_PRODUCTS); setErrorCode(e?.code || 'network.error'); });
+  }, []);
+
+  const addToCart = (pid: string) => {
+      const source_id = Number(pid) || 1;
+      cartAdd(source_id, 1).then(() => {}).catch(() => {});
+  };
 
   return (
     <div className="animate-fade-in pb-12 bg-[#F5F5F5] min-h-screen pt-[45px]">
       <MallTabs />
+      {errorCode && (
+        <div className="w-full max-w-[1200px] mx-auto px-4 mt-4">
+          {/* @ts-ignore */}
+          {React.createElement(require('../components/ErrorBanner').ErrorBanner, { code: errorCode, onRetry: () => location.reload() })}
+        </div>
+      )}
       
       {/* Activity Carousel (Above Grid) */}
       <MallBanner />
@@ -313,9 +349,9 @@ export const MallHome: React.FC = () => {
             {/* [M-05] Sort Bar - 只保留排序选项 */}
             <SortBar />
 
-            {/* [M-07] Product Grid */}
+      {/* [M-07] Product Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-               {MOCK_PRODUCTS.map(product => (
+               {products.map(product => (
                   <Card 
                      key={product.id} 
                      variant="interactive" 
@@ -332,7 +368,7 @@ export const MallHome: React.FC = () => {
                         </div>
                         {/* Hover Actions */}
                         <div className="absolute bottom-[-40px] left-0 w-full bg-[#4CAF50]/90 backdrop-blur-sm p-2 flex justify-center gap-4 transition-all group-hover:bottom-0">
-                           <button className="text-white hover:scale-110 transition-transform" title="加入购物车"><ShoppingCart size={18}/></button>
+                           <button className="text-white hover:scale-110 transition-transform" title="加入购物车" onClick={(e) => { e.stopPropagation(); addToCart(product.id); }}><ShoppingCart size={18}/></button>
                            <button className="text-white hover:scale-110 transition-transform" title="收藏"><Heart size={18}/></button>
                         </div>
                      </div>
@@ -359,8 +395,7 @@ export const MallHome: React.FC = () => {
                      </div>
                   </Card>
                ))}
-               {/* Duplicate items to fill grid for demo */}
-               {MOCK_PRODUCTS.slice(0, 2).map((product, i) => (
+               {products.slice(0, 2).map((product, i) => (
                   <Card 
                      key={`dup-${i}`}
                      variant="interactive" 
