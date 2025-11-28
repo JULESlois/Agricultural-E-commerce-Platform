@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Card, Badge, SectionTitle } from '../components/Common';
 import { MOCK_PRODUCTS, MOCK_SHOP } from '../constants';
 import { Star, Truck, ShieldCheck, ShoppingCart, Heart, Share2, ChevronRight, Minus, Plus, Store, MessageCircle, GitCompare } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 export const ProductDetail: React.FC = () => {
   const { id } = useParams();
@@ -36,17 +37,92 @@ export const ProductDetail: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
-        {/* Left: Image Gallery */}
+        {/* Left */}
         <div className="space-y-4">
           <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-            <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
+            <img 
+              src={product.imageUrl} 
+              alt={product.title} 
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              onError={(e) => { e.currentTarget.src = '/assests/logo.png'; e.currentTarget.style.objectFit = 'contain'; e.currentTarget.style.background = '#ffffff'; }}
+              className="w-full h-full object-cover" 
+            />
           </div>
           <div className="grid grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className={`aspect-square rounded-lg overflow-hidden cursor-pointer border-2 ${i === 0 ? 'border-[#4CAF50]' : 'border-transparent hover:border-gray-200'}`}>
-                <img src={product.imageUrl} alt="thumbnail" className="w-full h-full object-cover" />
+                <img 
+                  src={product.imageUrl} 
+                  alt="thumbnail" 
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => { e.currentTarget.src = '/assests/logo.png'; e.currentTarget.style.objectFit = 'contain'; e.currentTarget.style.background = '#ffffff'; }}
+                  className="w-full h-full object-cover" 
+                />
               </div>
             ))}
+          </div>
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-bold text-gray-800 text-sm">价格指数</span>
+              <span className="text-[10px] text-gray-400">实时更新</span>
+            </div>
+            <div className="h-32 w-full text-xs">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={(() => {
+                  const t = product.title;
+                  if (t.includes('苹果')) return [
+                    { day: '周一', price: 4.2 },
+                    { day: '周二', price: 4.1 },
+                    { day: '周三', price: 4.3 },
+                    { day: '周四', price: 4.5 },
+                    { day: '周五', price: 4.4 },
+                    { day: '周六', price: 4.6 },
+                    { day: '周日', price: 4.5 },
+                  ];
+                  if (t.includes('柿')) return [
+                    { day: '周一', price: 3.0 },
+                    { day: '周二', price: 3.2 },
+                    { day: '周三', price: 3.1 },
+                    { day: '周四', price: 3.3 },
+                    { day: '周五', price: 3.4 },
+                    { day: '周六', price: 3.6 },
+                    { day: '周日', price: 3.5 },
+                  ];
+                  if (t.includes('西红柿')) return [
+                    { day: '周一', price: 2.8 },
+                    { day: '周二', price: 2.9 },
+                    { day: '周三', price: 2.7 },
+                    { day: '周四', price: 2.6 },
+                    { day: '周五', price: 2.7 },
+                    { day: '周六', price: 2.9 },
+                    { day: '周日', price: 3.0 },
+                  ];
+                  return [
+                    { day: '周一', price: 2.4 },
+                    { day: '周二', price: 2.6 },
+                    { day: '周三', price: 2.5 },
+                    { day: '周四', price: 2.8 },
+                    { day: '周五', price: 2.7 },
+                    { day: '周六', price: 3.1 },
+                    { day: '周日', price: 3.0 },
+                  ];
+                })()}>
+                  <defs>
+                    <linearGradient id="pdColorPrice" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4CAF50" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#4CAF50" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis dataKey="day" hide />
+                  <YAxis hide />
+                  <Tooltip contentStyle={{borderRadius: '4px', fontSize: '12px'}} />
+                  <Area type="monotone" dataKey="price" stroke="#4CAF50" fillOpacity={1} fill="url(#pdColorPrice)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 

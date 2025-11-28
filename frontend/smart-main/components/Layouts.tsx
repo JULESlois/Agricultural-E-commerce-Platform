@@ -10,6 +10,7 @@ const TopHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [searchHistory, setSearchHistory] = useState(['红富士苹果', '有机大米', '大棚建设贷款', '果树修剪技术']);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -132,6 +133,14 @@ const TopHeader = () => {
                     type="text" 
                     placeholder={placeholder} 
                     className="bg-transparent border-none outline-none text-sm w-full text-[#212121] placeholder-gray-400"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const q = searchTerm.trim();
+                        if (q) navigate(`/mall/list?q=${encodeURIComponent(q)}`);
+                      }
+                    }}
                     onFocus={() => setIsSearchFocused(true)}
                     onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                   />
@@ -158,7 +167,11 @@ const TopHeader = () => {
                       {searchHistory.length > 0 ? (
                          <div className="flex flex-wrap gap-2">
                             {searchHistory.map((term, idx) => (
-                               <button key={idx} className="px-3 py-1 bg-gray-50 hover:bg-green-50 text-gray-600 hover:text-[#4CAF50] text-sm rounded-full transition-colors">
+                               <button 
+                                 key={idx} 
+                                 className="px-3 py-1 bg-gray-50 hover:bg-green-50 text-gray-600 hover:text-[#4CAF50] text-sm rounded-full transition-colors"
+                                 onMouseDown={() => navigate(`/mall/list?q=${encodeURIComponent(term)}`)}
+                               >
                                   {term}
                                </button>
                             ))}
@@ -416,7 +429,7 @@ export const PortalLayout: React.FC = () => {
   }, [isPortalHome]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
+    <div className="min-h-screen flex flex-col bg-[#FAFAFA] overflow-x-hidden">
       <TopHeader />
       
       {/* Conditionally render PortalNav */}
@@ -456,7 +469,7 @@ export const DashboardLayout: React.FC = () => {
   const menuItems = DASHBOARD_MENU[role] || DASHBOARD_MENU.FARMER;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F5F5]">
+    <div className="min-h-screen flex flex-col bg-[#F5F5F5] overflow-x-hidden">
       {/* Simplified Header for Dashboard */}
       <header className="fixed top-0 w-full h-[60px] bg-white border-b border-[#E0E0E0] z-50 flex items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" title="返回门户首页">
@@ -533,8 +546,8 @@ export const DashboardLayout: React.FC = () => {
 
 export const TradeLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
-       <header className="h-[80px] bg-white border-b border-[#E0E0E0] flex items-center justify-center sticky top-0 z-50 shadow-sm">
+    <div className="min-h-screen flex flex-col bg-[#FAFAFA] overflow-x-hidden">
+      <header className="h-[80px] bg白 border-b border-[#E0E0E0] flex items-center justify中心 sticky top-0 z-50 shadow-sm">
           <div className="w-full max-w-[1400px] px-4 flex justify-between items-center">
              <Link to="/" className="flex items-center gap-4">
                 <img 

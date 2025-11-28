@@ -13,15 +13,58 @@ import {
 } from 'recharts';
 
 // --- [M-03] Dashboard Data ---
-const PRICE_DATA = [
-  { day: '周一', price: 102.4 },
-  { day: '周二', price: 103.1 },
-  { day: '周三', price: 102.8 },
-  { day: '周四', price: 104.2 },
-  { day: '周五', price: 105.5 },
-  { day: '周六', price: 104.9 },
-  { day: '周日', price: 106.2 },
-];
+const PRICE_SERIES: Record<string, { day: string; price: number }[]> = {
+  apple: [
+    { day: '周一', price: 102.4 },
+    { day: '周二', price: 103.1 },
+    { day: '周三', price: 102.8 },
+    { day: '周四', price: 104.2 },
+    { day: '周五', price: 105.5 },
+    { day: '周六', price: 104.9 },
+    { day: '周日', price: 106.2 },
+  ],
+  persimmon: [
+    { day: '周一', price: 88.0 },
+    { day: '周二', price: 89.2 },
+    { day: '周三', price: 88.6 },
+    { day: '周四', price: 90.1 },
+    { day: '周五', price: 91.0 },
+    { day: '周六', price: 92.4 },
+    { day: '周日', price: 92.0 },
+  ],
+  tomato: [
+    { day: '周一', price: 72.0 },
+    { day: '周二', price: 71.5 },
+    { day: '周三', price: 73.2 },
+    { day: '周四', price: 74.0 },
+    { day: '周五', price: 73.6 },
+    { day: '周六', price: 75.5 },
+    { day: '周日', price: 76.1 },
+  ],
+  grape: [
+    { day: '周一', price: 96.0 },
+    { day: '周二', price: 95.1 },
+    { day: '周三', price: 95.8 },
+    { day: '周四', price: 97.2 },
+    { day: '周五', price: 98.4 },
+    { day: '周六', price: 97.9 },
+    { day: '周日', price: 99.3 },
+  ],
+};
+
+const CURVE_STYLE: Record<string, { stroke: string; type: 'monotone' | 'linear' | 'basis' | 'natural' | 'step' }> = {
+  apple: { stroke: '#4CAF50', type: 'monotone' },
+  persimmon: { stroke: '#FF9800', type: 'basis' },
+  tomato: { stroke: '#E53935', type: 'linear' },
+  grape: { stroke: '#7E57C2', type: 'natural' },
+};
+
+const SERIES_LABEL: Record<string, string> = {
+  apple: '红富士 (烟台)',
+  persimmon: '甜柿 (陕西)',
+  tomato: '西红柿 (寿光)',
+  grape: '葡萄 (吐鲁番)',
+};
 
 // --- [M-02] Categories Data ---
 const CATEGORIES_TREE = [
@@ -202,8 +245,11 @@ const Pagination = () => {
 // Main Mall Page
 export const MallHome: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const keyword = new URLSearchParams(location.search).get('q') || '';
   const [selectedCategory, setSelectedCategory] = useState<string>('fruit');
   const [sort, setSort] = useState<string>('');
+  const [priceCategory, setPriceCategory] = useState<keyof typeof PRICE_SERIES>('apple');
   const [items, setItems] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const pageSize = 16;
@@ -217,7 +263,7 @@ export const MallHome: React.FC = () => {
     setIsLoading(true);
     setIsError(null);
     try {
-      const resp = await MockApi.getProducts({ page, pageSize, sort });
+      const resp = await MockApi.getProducts({ page, pageSize, sort, keyword });
       setItems(prev => [...prev, ...resp.data]);
       setTotal(resp.total);
       setPage(p => p + 1);
@@ -226,12 +272,12 @@ export const MallHome: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, sort, isLoading]);
+  }, [page, pageSize, sort, keyword, isLoading]);
 
   useEffect(() => {
     setItems([]);
     setPage(1);
-  }, [sort]);
+  }, [sort, keyword]);
 
   useEffect(() => {
     loadMore();
@@ -309,24 +355,37 @@ export const MallHome: React.FC = () => {
                </div>
                <div className="h-32 w-full text-xs">
                   <ResponsiveContainer width="100%" height="100%">
-                     <AreaChart data={PRICE_DATA}>
+                     <AreaChart data={PRICE_SERIES[priceCategory]}>
                         <defs>
-                           <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#4CAF50" stopOpacity={0.2}/>
-                              <stop offset="95%" stopColor="#4CAF50" stopOpacity={0}/>
+                           <linearGradient id={`colorPrice-${priceCategory}`} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={CURVE_STYLE[priceCategory].stroke} stopOpacity={0.2}/>
+                              <stop offset="95%" stopColor={CURVE_STYLE[priceCategory].stroke} stopOpacity={0}/>
                            </linearGradient>
                         </defs>
                         <XAxis dataKey="day" hide />
                         <YAxis domain={['dataMin - 1', 'dataMax + 1']} hide />
                         <Tooltip contentStyle={{borderRadius: '4px', fontSize: '12px'}} />
-                        <Area type="monotone" dataKey="price" stroke="#4CAF50" fillOpacity={1} fill="url(#colorPrice)" strokeWidth={2} />
+                        <Area type={CURVE_STYLE[priceCategory].type} dataKey="price" stroke={CURVE_STYLE[priceCategory].stroke} fillOpacity={1} fill={`url(#colorPrice-${priceCategory})`} strokeWidth={2} />
                      </AreaChart>
                   </ResponsiveContainer>
                </div>
+               <div className="mt-2">
+                 <label className="text-xs text-gray-500 mr-2">类别</label>
+                 <select
+                   value={priceCategory}
+                   onChange={(e) => setPriceCategory(e.target.value as keyof typeof PRICE_SERIES)}
+                   className="border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:border-[#4CAF50] bg-white"
+                 >
+                   <option value="apple">苹果</option>
+                   <option value="persimmon">柿子</option>
+                   <option value="tomato">西红柿</option>
+                   <option value="grape">葡萄</option>
+                 </select>
+               </div>
                <div className="flex justify-between items-center mt-2 text-xs">
-                  <span className="text-gray-500">红富士 (烟台)</span>
+                  <span className="text-gray-500">{SERIES_LABEL[priceCategory]}</span>
                   <span className="text-red-500 font-bold flex items-center">
-                     106.2 <ArrowUpDown size={10} className="ml-1" />
+                     {PRICE_SERIES[priceCategory][PRICE_SERIES[priceCategory].length - 1].price} <ArrowUpDown size={10} className="ml-1" />
                   </span>
                </div>
             </div>
@@ -366,7 +425,7 @@ export const MallHome: React.FC = () => {
                 <button onClick={() => { setSort('price_asc'); }} className={`px-4 py-1.5 bg-white border border-l-0 ${sort === 'price_asc' ? 'text-[#4CAF50]' : 'text-gray-600'} text-sm rounded-r-sm`}>价格低到高</button>
               </div>
               <div className="flex items-center gap-3 pr-2">
-                <span className="text-xs text-gray-500">已加载 <b className="text-[#212121]">{items.length}</b> / 共 <b className="text-[#212121]">{total}</b></span>
+                <span className="text-xs text-gray-500">{keyword ? `搜索“${keyword}”结果` : '已加载'} <b className="text-[#212121]">{items.length}</b> / 共 <b className="text-[#212121]">{total}</b></span>
               </div>
             </div>
 
@@ -380,7 +439,14 @@ export const MallHome: React.FC = () => {
                      onClick={() => navigate(`/mall/item/${product.id}`)}
                   >
                      <div className="aspect-square bg-gray-100 relative overflow-hidden rounded-t-lg">
-                        <img src={product.imageUrl} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={product.title} />
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.title} 
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => { e.currentTarget.src = '/assests/logo.png'; e.currentTarget.style.objectFit = 'contain'; e.currentTarget.style.background = '#ffffff'; }}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                        />
                         {/* Tags Overlay */}
                         <div className="absolute top-2 left-2 flex flex-col gap-1">
                            {product.tags?.slice(0,2).map(tag => (

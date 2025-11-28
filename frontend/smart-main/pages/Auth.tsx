@@ -19,9 +19,14 @@ export const Login: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
+      try { localStorage.setItem('username', formData.username.trim()); } catch {}
+      try { sessionStorage.setItem('username', formData.username.trim()); } catch {}
       // Role-based redirect
-      if (formData.username.trim() === 'seller') {
+      const uname = formData.username.trim();
+      if (uname === 'seller') {
         navigate('/mall/seller/dashboard');
+      } else if (uname === 'banker') {
+        navigate('/finance/banker/dashboard');
       } else {
         // Redirect to orders by default for buyers
         navigate('/mall/buyer/orders');

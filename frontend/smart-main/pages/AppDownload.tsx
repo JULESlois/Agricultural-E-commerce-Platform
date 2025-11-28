@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Smartphone, Download, Star } from 'lucide-react';
+import { ArrowLeft, Smartphone, Download, Star, Apple } from 'lucide-react';
 import { Button } from '../components/Common';
 
 export const AppDownload: React.FC = () => {
@@ -56,7 +56,7 @@ export const AppDownload: React.FC = () => {
 
            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <button className="flex items-center gap-3 bg-white text-[#4CAF50] px-6 py-3.5 rounded-xl hover:bg-gray-100 transition-all shadow-lg active:scale-95">
-                 <div className="text-2xl"></div>
+                 <Apple size={28} className="text-[#4CAF50]" />
                  <div className="text-left leading-tight">
                     <div className="text-[10px] font-medium uppercase">Download on the</div>
                     <div className="font-bold text-lg">App Store</div>

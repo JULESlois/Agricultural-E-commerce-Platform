@@ -59,6 +59,7 @@ export const DASHBOARD_MENU: Record<string, any[]> = {
   BANKER: [
     { label: '信贷工作台', path: '/finance/banker/dashboard', icon: LayoutDashboard },
     { label: '贷款审批', path: '/finance/banker/approvals', icon: FileText },
+    { label: '放款记录', path: '/finance/banker/loan-records', icon: PieChart },
     { label: '贷后监控', path: '/finance/banker/monitoring', icon: ShieldAlert },
     { label: '客户管理', path: '/finance/customers', icon: Users },
   ],
@@ -150,6 +151,151 @@ export const MOCK_PRODUCTS: Product[] = [
     tags: ['谷物喂养'],
     specs: '30枚/盒',
     moq: 2
+  }
+  ,{
+    id: 'p7',
+    title: '阳光脆甜柿子 5kg',
+    price: 39.90,
+    origin: '陕西富平',
+    category: '水果',
+    imageUrl: 'https://images.unsplash.com/photo-1546555693-4d4b2043413d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '富平果业合作社',
+    stock: 1800,
+    tags: ['脆甜', '当季'],
+    specs: '5kg/箱',
+    moq: 1
+  },{
+    id: 'p8',
+    title: '库尔勒香梨 4kg',
+    price: 52.00,
+    origin: '新疆库尔勒',
+    category: '水果',
+    imageUrl: 'https://images.unsplash.com/photo-1518645357671-36fc5e4d6a36?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '西域果园',
+    stock: 1200,
+    tags: ['香甜细脆'],
+    specs: '4kg/箱',
+    moq: 1
+  },{
+    id: 'p9',
+    title: '阳光玫瑰葡萄 2kg',
+    price: 69.00,
+    origin: '云南红河',
+    category: '水果',
+    imageUrl: 'https://images.unsplash.com/photo-1596803244617-826ff4a22fea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '云岭果庄',
+    stock: 900,
+    tags: ['高甜', '脆皮'],
+    specs: '2kg/箱',
+    moq: 1
+  },{
+    id: 'p10',
+    title: '优选香蕉 5kg',
+    price: 35.00,
+    origin: '广西崇左',
+    category: '水果',
+    imageUrl: 'https://images.unsplash.com/photo-1615485737655-517b17461ac1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '南疆果场',
+    stock: 2000,
+    tags: ['自然熟'],
+    specs: '5kg/箱',
+    moq: 1
+  },{
+    id: 'p11',
+    title: '猕猴桃 3kg',
+    price: 49.90,
+    origin: '陕西周至',
+    category: '水果',
+    imageUrl: 'https://images.unsplash.com/photo-1604908554026-65de27c06cbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '秦岭果园',
+    stock: 1500,
+    tags: ['维C丰富'],
+    specs: '3kg/箱',
+    moq: 1
+  },{
+    id: 'p12',
+    title: '生态西红柿 5kg',
+    price: 26.80,
+    origin: '山东寿光',
+    category: '蔬菜',
+    imageUrl: 'https://images.unsplash.com/photo-1437750769460-02fd56b3cbab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '寿光蔬菜基地',
+    stock: 3000,
+    tags: ['鲜采'],
+    specs: '5kg/箱',
+    moq: 1
+  },{
+    id: 'p13',
+    title: '无刺黄瓜 5kg',
+    price: 29.90,
+    origin: '辽宁盘锦',
+    category: '蔬菜',
+    imageUrl: 'https://images.unsplash.com/photo-1550254478-91bbd620f2c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '北方菜园',
+    stock: 2800,
+    tags: ['清甜脆'],
+    specs: '5kg/箱',
+    moq: 1
+  },{
+    id: 'p14',
+    title: '当季土豆 10kg',
+    price: 32.00,
+    origin: '内蒙古呼伦贝尔',
+    category: '蔬菜',
+    imageUrl: 'https://images.unsplash.com/photo-1607302340972-748d551f4dfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '草原农场',
+    stock: 5000,
+    tags: ['沙质口感'],
+    specs: '10kg/袋',
+    moq: 1
+  },{
+    id: 'p15',
+    title: '鲜嫩胡萝卜 5kg',
+    price: 24.50,
+    origin: '甘肃张掖',
+    category: '蔬菜',
+    imageUrl: 'https://images.unsplash.com/photo-1506806732259-39c2d0268443?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '河西走廊蔬菜基地',
+    stock: 2600,
+    tags: ['高胡萝卜素'],
+    specs: '5kg/箱',
+    moq: 1
+  },{
+    id: 'p16',
+    title: '冷榨花生油 5L',
+    price: 89.00,
+    origin: '山东临沂',
+    category: '粮油',
+    imageUrl: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '鲁丰油坊',
+    stock: 800,
+    tags: ['初榨'],
+    specs: '5L/桶',
+    moq: 1
+  },{
+    id: 'p17',
+    title: '菜籽油 5L',
+    price: 78.00,
+    origin: '湖北荆门',
+    category: '粮油',
+    imageUrl: 'https://images.unsplash.com/photo-1554136632-7566f46a7d5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '田园油坊',
+    stock: 900,
+    tags: ['物理压榨'],
+    specs: '5L/桶',
+    moq: 1
+  },{
+    id: 'p18',
+    title: '散养黑猪五花肉 2kg',
+    price: 139.00,
+    origin: '江西吉安',
+    category: '畜牧',
+    imageUrl: 'https://images.unsplash.com/photo-1604908553996-99f3f0f40628?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    farmerName: '山野养殖场',
+    stock: 300,
+    tags: ['冷链', '当天现切'],
+    specs: '2kg/包',
+    moq: 1
   }
 ];
 

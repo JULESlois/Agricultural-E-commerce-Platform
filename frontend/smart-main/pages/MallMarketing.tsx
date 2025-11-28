@@ -28,9 +28,9 @@ export const MallActivity: React.FC = () => {
              </div>
              <h1 className="text-4xl font-bold mb-4">金秋丰收节 · 限时特惠</h1>
              <p className="text-red-100 text-lg mb-8">精选当季水果、粮油米面，低至 5 折起。助农增收，美味直达。</p>
-             <Button variant="solid-blue" className="bg-white text-red-600 hover:bg-gray-100 border-none shadow-md">
-                立即抢购
-             </Button>
+            <Button variant="text" className="!bg-white !text-red-600 hover:bg-gray-100 border-none shadow-md">
+              立即抢购
+            </Button>
           </div>
        </div>
 

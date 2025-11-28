@@ -12,10 +12,10 @@ const LikeIcon = ({ liked }: { liked?: boolean }) => <svg xmlns="http://www.w3.o
 const CommentIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.08-3.239A8.962 8.962 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.832 15.023L5.736 12.5A6.983 6.983 0 004 10c0-2.899 2.582-5.25 6-5.25s6 2.351 6 5.25-2.582 5.25-6 5.25a7.001 7.001 0 00-2.585-.43l-1.583.504z" clipRule="evenodd" /></svg>;
 const ShareIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>;
 
-const PostCard: React.FC<{ post: Post }> = ({ post }) => {
+const PostCard: React.FC<{ post: Post; onClick?: () => void }> = ({ post, onClick }) => {
     const [liked, setLiked] = useState(false);
     return (
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-md p-4 cursor-pointer" onClick={onClick}>
             <div className="flex items-start space-x-3">
                 <img src={post.user.avatarUrl} alt={post.user.name} className="w-12 h-12 rounded-full" />
                 <div>
@@ -55,6 +55,8 @@ const CreatePost: React.FC = () => {
 }
 
 const CommunityPage: React.FC<{ navigate: (page: string) => void }> = ({ navigate }) => {
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+    const selectedPost = selectedPostId ? posts.find(p => p.id === selectedPostId) : null;
     return (
         <div className="bg-gray-100 min-h-screen">
             <SimplifiedHeader navigate={navigate} pageTitle="用户社区" />
@@ -80,7 +82,9 @@ const CommunityPage: React.FC<{ navigate: (page: string) => void }> = ({ navigat
                     <main className="lg:col-span-2">
                         <CreatePost/>
                         <div className="space-y-6">
-                           {posts.map(post => <PostCard key={post.id} post={post} />)}
+                           {posts.map(post => (
+                             <PostCard key={post.id} post={post} onClick={() => setSelectedPostId(post.id)} />
+                           ))}
                         </div>
                     </main>
 
@@ -114,6 +118,48 @@ const CommunityPage: React.FC<{ navigate: (page: string) => void }> = ({ navigat
                     </aside>
                 </div>
             </div>
+            {selectedPost && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-xl shadow-xl w-[92%] max-w-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gray-800">问答详情</h3>
+                    <button className="text-gray-500" onClick={() => setSelectedPostId(null)}>×</button>
+                  </div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <img src={selectedPost.user.avatarUrl} alt={selectedPost.user.name} className="w-10 h-10 rounded-full" />
+                    <div>
+                      <div className="font-bold text-gray-800 text-sm">{selectedPost.user.name}</div>
+                      <div className="text-xs text-gray-500">{selectedPost.timestamp}</div>
+                    </div>
+                  </div>
+                  <div className="text-gray-800 whitespace-pre-wrap mb-4">{selectedPost.content}</div>
+                  {selectedPost.imageUrl && (
+                    <img src={selectedPost.imageUrl} alt="Post" className="rounded-lg w-full max-h-[420px] object-cover mb-4" />
+                  )}
+                  <div className="border-t pt-3">
+                    <div className="font-bold text-gray-700 mb-2 text-sm">全部评论</div>
+                    <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                      {selectedPost.comments.map(c => (
+                        <div key={c.id} className="flex items-start gap-3">
+                          <img src={c.user.avatarUrl} alt={c.user.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-800">{c.user.name} <span className="text-xs text-gray-400 ml-2">{c.timestamp}</span></div>
+                            <div className="text-sm text-gray-700">{c.content}</div>
+                          </div>
+                        </div>
+                      ))}
+                      {selectedPost.comments.length === 0 && (
+                        <div className="text-sm text-gray-500">暂无评论</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-6 flex gap-3">
+                    <button onClick={() => { setSelectedPostId(null); navigate('expert'); }} className="flex-1 bg-green-600 text-white font-bold py-2 rounded-lg">咨询专家</button>
+                    <button onClick={() => setSelectedPostId(null)} className="flex-1 bg-gray-100 text-gray-700 font-bold py-2 rounded-lg">关闭</button>
+                  </div>
+                </div>
+              </div>
+            )}
             <Footer />
         </div>
     );

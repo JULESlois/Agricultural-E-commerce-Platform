@@ -30,11 +30,14 @@ const ProductCompare = lazy(() => import('./pages/MallTools').then(m => ({ defau
 const InvoiceList = lazy(() => import('./pages/OrderServices').then(m => ({ default: m.InvoiceList })));
 const LogisticsDetail = lazy(() => import('./pages/OrderServices').then(m => ({ default: m.LogisticsDetail })));
 const FinanceHome = lazy(() => import('./pages/Finance').then(m => ({ default: m.FinanceHome })));
+const FinanceEvaluate = lazy(() => import('./pages/FinanceEvaluate').then(m => ({ default: m.FinanceEvaluate })));
+const FinanceMaterials = lazy(() => import('./pages/FinanceMaterials').then(m => ({ default: m.FinanceMaterials })));
 const LoanApplyWizard = lazy(() => import('./pages/Finance').then(m => ({ default: m.LoanApplyWizard })));
 const FarmerFinance = lazy(() => import('./pages/FinanceFarmer').then(m => ({ default: m.FarmerFinance })));
 const BankerDashboard = lazy(() => import('./pages/FinanceBanker').then(m => ({ default: m.BankerDashboard })));
 const BankerApprovalList = lazy(() => import('./pages/FinanceBanker').then(m => ({ default: m.BankerApprovalList })));
 const BankerApprovalDetail = lazy(() => import('./pages/FinanceBanker').then(m => ({ default: m.BankerApprovalDetail })));
+const BankerLoanRecords = lazy(() => import('./pages/FinanceBanker').then(m => ({ default: m.BankerLoanRecords })));
 const SellerDashboardHome = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.SellerDashboardHome })));
 const SellerProduct = lazy(() => import('./pages/SellerProduct').then(m => ({ default: m.SellerProduct })));
 const SellerProductForm = lazy(() => import('./pages/SellerProductForm').then(m => ({ default: m.SellerProductForm })));
@@ -125,6 +128,8 @@ const App: React.FC = () => {
           
           {/* Finance Public */}
           <Route path="/finance" element={<FinanceHome />} />
+          <Route path="/finance/evaluate" element={<FinanceEvaluate />} />
+          <Route path="/finance/materials" element={<FinanceMaterials />} />
           <Route path="/finance/apply/:id" element={<LoanApplyWizard />} />
           
           {/* Knowledge Public */}
@@ -182,6 +187,7 @@ const App: React.FC = () => {
            {/* Banker Routes */}
            <Route path="banker/dashboard" element={<BankerDashboard />} />
            <Route path="banker/approvals" element={<BankerApprovalList />} />
+           <Route path="banker/loan-records" element={<BankerLoanRecords />} />
            <Route path="banker/approval/:id" element={<BankerApprovalDetail />} />
            <Route path="banker/monitoring" element={<Navigate to="/finance/banker/dashboard" replace />} />
            

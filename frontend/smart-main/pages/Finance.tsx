@@ -20,7 +20,7 @@ export const FinanceHome: React.FC = () => {
             基于农业大数据信用评估，为您提供低利率、放款快的纯信用贷款。
           </p>
           <div className="pt-4 flex gap-4">
-            <Button className="bg-white text-[#1976D2] hover:bg-blue-50 border-none" onClick={() => navigate('/finance/apply/1')}>
+            <Button variant="text" className="bg-white text-[#1976D2] hover:bg-blue-50 border-none" onClick={() => navigate('/finance/evaluate')}>
               立即评估额度
             </Button>
             <Button variant="ghost" className="text-white border-white hover:bg-white/10">

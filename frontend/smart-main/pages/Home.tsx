@@ -52,15 +52,44 @@ const NEWS_DATA = {
   ]
 };
 
-const PRICE_DATA = [
-  { day: '周一', price: 2.4, name: '白菜' },
-  { day: '周二', price: 2.6, name: '白菜' },
-  { day: '周三', price: 2.5, name: '白菜' },
-  { day: '周四', price: 2.8, name: '白菜' },
-  { day: '周五', price: 2.7, name: '白菜' },
-  { day: '周六', price: 3.1, name: '白菜' },
-  { day: '周日', price: 3.0, name: '白菜' },
-];
+const PRICE_SERIES: Record<string, { day: string; price: number; name: string }[]> = {
+  白菜: [
+    { day: '周一', price: 2.4, name: '白菜' },
+    { day: '周二', price: 2.6, name: '白菜' },
+    { day: '周三', price: 2.5, name: '白菜' },
+    { day: '周四', price: 2.8, name: '白菜' },
+    { day: '周五', price: 2.7, name: '白菜' },
+    { day: '周六', price: 3.1, name: '白菜' },
+    { day: '周日', price: 3.0, name: '白菜' },
+  ],
+  苹果: [
+    { day: '周一', price: 4.2, name: '苹果' },
+    { day: '周二', price: 4.1, name: '苹果' },
+    { day: '周三', price: 4.3, name: '苹果' },
+    { day: '周四', price: 4.5, name: '苹果' },
+    { day: '周五', price: 4.4, name: '苹果' },
+    { day: '周六', price: 4.6, name: '苹果' },
+    { day: '周日', price: 4.5, name: '苹果' },
+  ],
+  柿子: [
+    { day: '周一', price: 3.0, name: '柿子' },
+    { day: '周二', price: 3.2, name: '柿子' },
+    { day: '周三', price: 3.1, name: '柿子' },
+    { day: '周四', price: 3.3, name: '柿子' },
+    { day: '周五', price: 3.4, name: '柿子' },
+    { day: '周六', price: 3.6, name: '柿子' },
+    { day: '周日', price: 3.5, name: '柿子' },
+  ],
+  西红柿: [
+    { day: '周一', price: 2.8, name: '西红柿' },
+    { day: '周二', price: 2.9, name: '西红柿' },
+    { day: '周三', price: 2.7, name: '西红柿' },
+    { day: '周四', price: 2.6, name: '西红柿' },
+    { day: '周五', price: 2.7, name: '西红柿' },
+    { day: '周六', price: 2.9, name: '西红柿' },
+    { day: '周日', price: 3.0, name: '西红柿' },
+  ],
+};
 
 const PARTNERS = [
   '中国农业银行', '中国建设银行', '顺丰速运', '京东物流', '中国农业大学', '中华全国供销合作总社', '阿里云', '华为云'
@@ -96,6 +125,8 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const [currentBanner, setCurrentBanner] = useState(0);
   const [activeNewsTab, setActiveNewsTab] = useState<'policy' | 'tech' | 'platform'>('policy');
+  const [priceCategory, setPriceCategory] = useState<'白菜' | '苹果' | '柿子' | '西红柿'>('白菜');
+  const chartData = PRICE_SERIES[priceCategory];
   
   // Mock User State (Toggle for demo)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -356,6 +387,9 @@ const Home: React.FC = () => {
                         <img 
                            src={product.imageUrl} 
                            alt={product.title} 
+                           loading="lazy"
+                           referrerPolicy="no-referrer"
+                           onError={(e) => { e.currentTarget.src = '/assests/logo.png'; e.currentTarget.style.objectFit = 'contain'; e.currentTarget.style.background = '#ffffff'; }}
                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                      </div>
@@ -437,7 +471,7 @@ const Home: React.FC = () => {
             </div>
             <div className="flex-1 min-h-[200px] w-full text-xs">
                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={PRICE_DATA} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                  <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                      <defs>
                         <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                            <stop offset="5%" stopColor="#4CAF50" stopOpacity={0.2}/>
@@ -451,13 +485,27 @@ const Home: React.FC = () => {
                         contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} 
                         itemStyle={{color: '#4CAF50', fontWeight: 'bold'}}
                      />
-                     <Area type="monotone" dataKey="price" stroke="#4CAF50" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" name="大宗白菜均价" />
+                     <Area type="monotone" dataKey="price" stroke="#4CAF50" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" name={`${priceCategory}均价`} />
                   </AreaChart>
                </ResponsiveContainer>
             </div>
             <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center text-xs">
-               <span className="text-gray-500">今日指数: <b className="text-[#4CAF50]">102.4</b></span>
-               <span className="text-red-500 flex items-center">环比 +0.5% <TrendingUp size={12} className="ml-1"/></span>
+               <div className="flex items-center gap-2">
+                  <span className="text-gray-500">类别:</span>
+                  {(['白菜','苹果','柿子','西红柿'] as const).map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setPriceCategory(cat)}
+                      className={`${priceCategory === cat ? 'bg-green-50 text-green-600 border-green-200' : 'text-gray-600 border-gray-200 hover:border-green-300 hover:text-green-600'} px-2 py-1 rounded-full border transition-colors`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+               </div>
+               <div className="flex items-center gap-4">
+                 <span className="text-gray-500">今日指数: <b className="text-[#4CAF50]">102.4</b></span>
+                 <span className="text-red-500 flex items-center">环比 +0.5% <TrendingUp size={12} className="ml-1"/></span>
+               </div>
             </div>
          </div>
       </section>

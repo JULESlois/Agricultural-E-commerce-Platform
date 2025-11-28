@@ -257,3 +257,90 @@ export const BankerApprovalDetail: React.FC = () => {
       </div>
    );
 };
+
+// BK-04: Loan Records
+export const BankerLoanRecords: React.FC = () => {
+  const navigate = useNavigate();
+  const [filter, setFilter] = useState({ keyword: '', date: '', status: 'all' });
+  const records = [
+    { id: 'LN202511280001', name: '李四', product: '农资周转贷', amount: 200000, date: '2025-11-26', status: '已放款' },
+    { id: 'LN202511270011', name: '王五', product: '订单预售贷', amount: 120000, date: '2025-11-25', status: '已放款' },
+    { id: 'LN202511250021', name: '赵六', product: '设备购置贷', amount: 350000, date: '2025-11-23', status: '已结清' },
+  ];
+
+  const filtered = records.filter(r =>
+    (filter.status === 'all' || r.status === filter.status) &&
+    (filter.keyword === '' || r.name.includes(filter.keyword) || r.id.includes(filter.keyword)) &&
+    (filter.date === '' || r.date === filter.date)
+  );
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-[#212121]">放款记录</h1>
+        <Button variant="text" size="sm" onClick={() => navigate('/finance/banker/dashboard')}>返回工作台</Button>
+      </div>
+
+      <Card className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input 
+            className="border border-gray-300 rounded px-3 py-2 text-sm" 
+            placeholder="按记录号/姓名搜索"
+            value={filter.keyword}
+            onChange={(e) => setFilter({ ...filter, keyword: e.target.value })}
+          />
+          <input 
+            type="date" 
+            className="border border-gray-300 rounded px-3 py-2 text-sm" 
+            value={filter.date}
+            onChange={(e) => setFilter({ ...filter, date: e.target.value })}
+          />
+          <select 
+            className="border border-gray-300 rounded px-3 py-2 text-sm"
+            value={filter.status}
+            onChange={(e) => setFilter({ ...filter, status: e.target.value })}
+          >
+            <option value="all">全部状态</option>
+            <option value="已放款">已放款</option>
+            <option value="已结清">已结清</option>
+          </select>
+          <Button variant="solid-green">查询</Button>
+        </div>
+      </Card>
+
+      <Card className="p-0">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-gray-50 text-gray-500">
+            <tr>
+              <th className="p-4">记录号</th>
+              <th className="p-4">客户</th>
+              <th className="p-4">产品</th>
+              <th className="p-4">放款金额</th>
+              <th className="p-4">放款日期</th>
+              <th className="p-4">状态</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {filtered.map(r => (
+              <tr key={r.id} className="hover:bg-gray-50">
+                <td className="p-4 font-mono text-gray-600">{r.id}</td>
+                <td className="p-4 font-bold">{r.name}</td>
+                <td className="p-4">{r.product}</td>
+                <td className="p-4">¥{r.amount.toLocaleString()}</td>
+                <td className="p-4">{r.date}</td>
+                <td className="p-4">
+                  <Badge color={r.status === '已放款' ? 'blue' : 'green'}>{r.status}</Badge>
+                </td>
+              </tr>
+            ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td className="p-6 text-center text-gray-400" colSpan={6}>无匹配记录</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+};
