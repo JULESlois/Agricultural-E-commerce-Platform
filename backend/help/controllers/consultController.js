@@ -157,12 +157,20 @@ const completeConsult = async (req, res) => {
     const expert_id = req.user.expert_id;
 
     try {
-        await pool.query(
+        const updateRes = await pool.query(
             `UPDATE expert_consult_record
-       SET status = 4, consult_result = $1, related_article_id = $2, complete_time = NOW()
-       WHERE record_id = $1 AND expert_id = $2 AND status = 1`,
-            [record_id, consult_result, related_article_id || null, expert_id]
+       SET status = 4,
+           consult_result = $1,
+           related_article_id = $2,
+           complete_time = NOW()
+       WHERE record_id = $3 AND expert_id = $4 AND status = 1`,
+            [consult_result, related_article_id || null, record_id, expert_id]
         );
+
+        if (updateRes.rowCount === 0) {
+            return fail(res, 404, '记录不存在或无法完成');
+        }
+
         success(res, 200, '咨询已完成。', { record_id, consult_status: 4 });
     } catch (err) {
         console.error(err);
