@@ -102,16 +102,10 @@ class OrderController {
       const pageSize = 10;
       const userType = req.user.userType === 1 ? 'seller' : 'buyer';
 
-      // 处理status参数，过滤掉undefined字符串
-      let statusValue = null;
-      if (status && status !== 'undefined' && status !== 'null') {
-        statusValue = Number.parseInt(status, 10);
-      }
-
       const orders = await OrderModel.findByUser(
         req.user.userId, 
         userType, 
-        statusValue,
+        status ? Number.parseInt(status, 10) : null,
         Number.parseInt(page, 10),
         pageSize
       );

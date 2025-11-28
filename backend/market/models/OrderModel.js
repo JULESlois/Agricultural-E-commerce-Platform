@@ -74,9 +74,9 @@ class OrderModel {
     const values = [userId];
     let paramCount = 2;
 
-    if (status !== null && status !== undefined && status !== 'undefined') {
+    if (status !== null) {
       whereClause += ` AND o.order_status = $${paramCount}`;
-      values.push(parseInt(status));
+      values.push(status);
       paramCount++;
     }
 

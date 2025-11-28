@@ -1,8 +1,5 @@
 const express = require('express');
-const cors = require('cors');
 const { pool, testConnection } = require('./database');
-const authRoutes = require('./routes/auth');
-const cartRoutes = require('./routes/cart');
 const farmerRoutes = require('./routes/farmers');
 const buyerRoutes = require('./routes/buyers');
 const addressRoutes = require('./routes/addresses');
@@ -20,14 +17,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // 中间件
-app.use(cors()); // 启用CORS
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 路由
-app.use('/api/auth', authRoutes); // 认证路由
-app.use('/api', cartRoutes); // 购物车路由
-app.use('/api', statsRoutes); // 统计路由（必须在buyers/farmers之前）
 app.use('/api/farmers', farmerRoutes);
 app.use('/api/buyers', buyerRoutes);
 app.use('/api/addresses', addressRoutes);
@@ -38,6 +31,7 @@ app.use('/api', followRoutes);
 app.use('/api', footprintRoutes);
 app.use('/api', aftersaleRoutes);
 app.use('/api', collectionRoutes);
+app.use('/api', statsRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', require('./routes/activity'));
 
