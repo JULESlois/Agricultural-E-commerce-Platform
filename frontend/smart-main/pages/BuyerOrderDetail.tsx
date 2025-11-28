@@ -1,13 +1,14 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Badge, SectionTitle } from '../components/Common';
-import { MOCK_ORDER_DETAIL } from '../constants';
+import { useMockQuery } from '../src/hooks/useMockQuery';
+import { MockApi } from '../src/mock/mockApi';
 import { ArrowLeft, MapPin, Truck, Package, MessageSquare, CreditCard, Clock, Receipt, RefreshCcw, Store } from 'lucide-react';
 
 export const BuyerOrderDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const order = MOCK_ORDER_DETAIL; // Mock data
+  const { data: order, isLoading, isError, retry } = useMockQuery(() => MockApi.getOrderDetail(id!), [id]);
 
   const steps = [
     { label: '提交订单', time: order.createTime, active: true },
@@ -16,6 +17,14 @@ export const BuyerOrderDetail: React.FC = () => {
     { label: '确认收货', time: order.finishTime, active: !!order.finishTime },
     { label: '评价', time: '', active: false },
   ];
+
+  if (isLoading) {
+    return <div className="space-y-6 animate-fade-in max-w-5xl mx-auto"><div className="h-[180px] bg-white border border-gray-200 rounded animate-pulse" /><div className="h-[400px] bg-white border border-gray-200 rounded animate-pulse" /></div>;
+  }
+
+  if (isError || !order) {
+    return <div className="max-w-5xl mx-auto bg-red-50 border border-red-200 text-red-600 p-6 rounded">加载失败，请重试 <Button variant="ghost" size="sm" onClick={retry}>重试</Button></div>;
+  }
 
   return (
     <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">

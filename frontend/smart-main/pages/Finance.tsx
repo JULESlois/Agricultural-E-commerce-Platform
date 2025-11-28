@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, SectionTitle, Badge } from '../components/Common';
-import { MOCK_LOANS, COLORS } from '../constants';
+import { COLORS } from '../constants';
+import { useMockQuery } from '../src/hooks/useMockQuery';
+import { MockApi } from '../src/mock/mockApi';
 import { CheckCircle2, ChevronRight, Landmark, PieChart, Shield, CreditCard, FileText, PenTool, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export const FinanceHome: React.FC = () => {
   const navigate = useNavigate();
+  const { data: loans, isLoading, isError, retry } = useMockQuery(() => MockApi.getLoans(), []);
 
   return (
     <div className="animate-fade-in space-y-12">
@@ -65,7 +68,11 @@ export const FinanceHome: React.FC = () => {
       <section>
         <SectionTitle title="热门贷款产品" subtitle="根据您的经营需求，选择合适的资金方案" />
         <div className="space-y-4">
-          {MOCK_LOANS.map((loan, idx) => (
+          {isLoading && Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-[120px] bg-white border border-gray-200 rounded animate-pulse" />)}
+          {isError && (
+            <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded">加载失败 <Button variant="ghost" size="sm" onClick={retry}>重试</Button></div>
+          )}
+          {loans && loans.map((loan, idx) => (
             <Card key={loan.id} variant="interactive" className="p-6 flex flex-col md:flex-row items-center justify-between gap-6 border border-gray-100 hover:border-[#1976D2] group">
               <div className="flex-1">
                  <div className="flex items-center gap-3 mb-2">
@@ -77,7 +84,7 @@ export const FinanceHome: React.FC = () => {
                  </div>
               </div>
               
-              <div className="flex gap-8 md:gap-12 text-center">
+              <div className="flex gap-8 md:gap-12 text中心">
                  <div>
                    <div className="text-2xl font-bold text-[#FF9800]">{loan.rate}</div>
                    <div className="text-xs text-gray-400">年化利率起</div>

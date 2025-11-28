@@ -1,11 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Badge, SectionTitle } from '../components/Common';
-import { MOCK_EXPERTS, MOCK_ARTICLES, MOCK_QA } from '../constants';
+import { useMockQuery } from '../src/hooks/useMockQuery';
+import { MockApi } from '../src/mock/mockApi';
 import { Search, MessageCircle, BookOpen, ChevronRight, PlayCircle, Eye, ThumbsUp } from 'lucide-react';
 
 export const KnowledgeHome: React.FC = () => {
   const navigate = useNavigate();
+  const { data: articleResp, isLoading: aLoading, isError: aError, retry: aRetry } = useMockQuery(() => MockApi.getArticles({ page: 1, pageSize: 10 }), []);
+  const { data: expert } = useMockQuery(() => MockApi.getExpertById('e1'), []);
+  const { data: qaResp } = useMockQuery(() => MockApi.getQA({ page: 1, pageSize: 5 }), []);
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -56,9 +60,12 @@ export const KnowledgeHome: React.FC = () => {
                </div>
             </div>
 
-            {/* K-Article-List */}
             <div className="space-y-4">
-               {MOCK_ARTICLES.map((article) => (
+               {aLoading && Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-[140px] bg-white border border-gray-200 rounded animate-pulse" />)}
+               {aError && (
+                 <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded">文章加载失败 <Button variant="ghost" size="sm" onClick={aRetry}>重试</Button></div>
+               )}
+               {articleResp && articleResp.data.map((article) => (
                   <Card 
                      key={article.id} 
                      variant="interactive" 
@@ -110,11 +117,11 @@ export const KnowledgeHome: React.FC = () => {
                   <span className="text-xs text-gray-400 cursor-pointer hover:text-[#2E7D32]">查看全部</span>
                </div>
                <div className="divide-y divide-gray-50">
-                  {MOCK_EXPERTS.slice(0, 3).map((expert) => (
-                     <div key={expert.id} className="p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors">
+                  {[expert].filter(Boolean).map((expert) => (
+                     <div key={expert.id} className="p-4 flex items中心 gap-3 hover:bg-gray-50 transition-colors">
                         <div className="relative">
                            <img src={expert.avatarUrl} className="w-12 h-12 rounded-full object-cover" alt={expert.name} />
-                           <div className="absolute -bottom-1 -right-1 bg-yellow-400 text-white text-[8px] px-1 rounded-sm font-bold">认证</div>
+                           <div className="absolute -bottom-1 -right-1 bg黄400 text白 text-[8px] px-1 rounded-sm font-bold">认证</div>
                         </div>
                         <div className="flex-1">
                            <div className="font-bold text-sm text-[#212121]">{expert.name}</div>
@@ -130,7 +137,7 @@ export const KnowledgeHome: React.FC = () => {
                         </Button>
                      </div>
                   ))}
-               </div>
+              </div>
             </Card>
 
             {/* K-Q&A Widget */}
@@ -142,7 +149,7 @@ export const KnowledgeHome: React.FC = () => {
                   </Button>
                </div>
                <div className="p-4 space-y-4">
-                  {MOCK_QA.map((qa) => (
+                  {qaResp && qaResp.data.map((qa) => (
                      <div key={qa.id} className="group cursor-pointer">
                         <div className="flex gap-2 mb-1">
                            <span className="bg-orange-100 text-orange-600 text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0 h-fit mt-0.5">问</span>
@@ -152,7 +159,7 @@ export const KnowledgeHome: React.FC = () => {
                         <div className="text-[10px] text-gray-400 pl-7 mt-1">{qa.time}</div>
                      </div>
                   ))}
-               </div>
+              </div>
             </Card>
 
             {/* Promotion/Video */}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Card, Badge } from '../components/Common';
-import { MOCK_PRODUCTS, MOCK_SHOP } from '../constants';
+import { MOCK_SHOP } from '../constants';
+import { MockApi } from '../src/mock/mockApi';
 import { 
   Search, ShoppingCart, ChevronRight, Filter, 
   ArrowUpDown, ChevronLeft, Store, 
@@ -202,6 +203,53 @@ const Pagination = () => {
 export const MallHome: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('fruit');
+  const [sort, setSort] = useState<string>('');
+  const [items, setItems] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 16;
+  const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<Error | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const loadMore = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setIsError(null);
+    try {
+      const resp = await MockApi.getProducts({ page, pageSize, sort });
+      setItems(prev => [...prev, ...resp.data]);
+      setTotal(resp.total);
+      setPage(p => p + 1);
+    } catch (e: any) {
+      setIsError(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, pageSize, sort, isLoading]);
+
+  useEffect(() => {
+    setItems([]);
+    setPage(1);
+  }, [sort]);
+
+  useEffect(() => {
+    loadMore();
+  }, [sort]);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      const hasMore = (page - 1) * pageSize < total;
+      if (entry.isIntersecting && hasMore && !isLoading && !isError) {
+        loadMore();
+      }
+    });
+    io.observe(node);
+    return () => io.disconnect();
+  }, [page, pageSize, total, isLoading, isError, loadMore]);
 
   return (
     <div className="animate-fade-in pb-12 bg-[#F5F5F5] min-h-screen pt-[45px]">
@@ -311,15 +359,24 @@ export const MallHome: React.FC = () => {
          <div className="col-span-12 lg:col-span-9">
             
             {/* [M-05] Sort Bar - 只保留排序选项 */}
-            <SortBar />
+            <div className="bg-[#F9F9F9] border border-gray-200 rounded-t-lg p-2 flex justify-between items-center">
+              <div className="flex items-center">
+                <button onClick={() => { setSort(''); }} className={`px-4 py-1.5 bg-white border ${sort === '' ? 'text-[#4CAF50]' : 'text-gray-600'} border-gray-200 text-sm rounded-l-sm`}>综合</button>
+                <button onClick={() => { setSort('price_desc'); }} className={`px-4 py-1.5 bg-white border border-l-0 ${sort === 'price_desc' ? 'text-[#4CAF50]' : 'text-gray-600'} text-sm`}>价格高到低</button>
+                <button onClick={() => { setSort('price_asc'); }} className={`px-4 py-1.5 bg-white border border-l-0 ${sort === 'price_asc' ? 'text-[#4CAF50]' : 'text-gray-600'} text-sm rounded-r-sm`}>价格低到高</button>
+              </div>
+              <div className="flex items-center gap-3 pr-2">
+                <span className="text-xs text-gray-500">已加载 <b className="text-[#212121]">{items.length}</b> / 共 <b className="text-[#212121]">{total}</b></span>
+              </div>
+            </div>
 
-            {/* [M-07] Product Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-               {MOCK_PRODUCTS.map(product => (
+            {/* [M-07] Masonry Product List */}
+            <div className="masonry columns-2 md:columns-3 xl:columns-4 mt-4">
+               {items.map(product => (
                   <Card 
                      key={product.id} 
                      variant="interactive" 
-                     className="group flex flex-col h-full border border-gray-200 hover:border-[#4CAF50] hover:shadow-md transition-all duration-300"
+                     className="group break-inside-avoid mb-4 flex flex-col h-full border border-gray-200 hover:border-[#4CAF50] hover:shadow-md transition-all duration-300"
                      onClick={() => navigate(`/mall/item/${product.id}`)}
                   >
                      <div className="aspect-square bg-gray-100 relative overflow-hidden rounded-t-lg">
@@ -359,35 +416,19 @@ export const MallHome: React.FC = () => {
                      </div>
                   </Card>
                ))}
-               {/* Duplicate items to fill grid for demo */}
-               {MOCK_PRODUCTS.slice(0, 2).map((product, i) => (
-                  <Card 
-                     key={`dup-${i}`}
-                     variant="interactive" 
-                     className="group flex flex-col h-full border border-gray-200 hover:border-[#4CAF50] hover:shadow-md transition-all duration-300"
-                     onClick={() => navigate(`/mall/item/${product.id}`)}
-                  >
-                     <div className="aspect-square bg-gray-100 relative overflow-hidden rounded-t-lg">
-                        <img src={product.imageUrl} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={product.title} />
-                     </div>
-                     <div className="p-3 flex flex-col flex-grow bg-white">
-                         <div className="mb-1 text-xs text-gray-400 flex items-center gap-1"><MapPin size={12}/> {product.origin}</div>
-                         <h4 className="font-bold text-sm text-[#333] line-clamp-2 mb-auto group-hover:text-[#4CAF50] transition-colors">{product.title}</h4>
-                         <div className="mt-3 pt-3 border-t border-dashed border-gray-100 flex items-end justify-between">
-                           <div>
-                              <span className="text-xs text-[#FF5722] font-bold">¥</span>
-                              <span className="text-lg text-[#FF5722] font-bold">{product.price.toFixed(2)}</span>
-                           </div>
-                           <div className="text-xs text-gray-400">已售 500+</div>
-                        </div>
-                     </div>
-                  </Card>
+               {isLoading && Array.from({ length: 6 }).map((_, i) => (
+                 <div key={`sk-${i}`} className="h-[240px] bg-white border border-gray-200 rounded-lg mb-4 animate-pulse break-inside-avoid" />
                ))}
+               {isError && (
+                 <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded mb-4 break-inside-avoid">加载失败，请重试</div>
+               )}
+               <div ref={sentinelRef} className="h-6" />
             </div>
 
-            {/* [M-08] Pagination */}
-            <Pagination />
-         </div>
+            <div className="flex justify中心 items-center gap-2 mt-8">
+              <button onClick={loadMore} className="px-3 py-1 border border-gray-200 rounded hover:border-[#4CAF50] hover:text-[#4CAF50] text-sm bg-white" disabled={isLoading || (page - 1) * pageSize >= total}>{(page - 1) * pageSize >= total ? '已到底' : isLoading ? '加载中' : '加载更多'}</button>
+            </div>
+        </div>
       </div>
     </div>
   );
